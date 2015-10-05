@@ -19,6 +19,8 @@ import webapp2
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
 from google.appengine.ext import ndb
+from google.appengine.ext import blobstore
+from google.appengine.ext.webapp import blobstore_handlers
 
 
 class MainHandler(webapp2.RequestHandler):
@@ -59,20 +61,42 @@ def get_user_email():
   if user:
     result = user.email()
   return result
+###############################################################################
+class InfoUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
+  def post(self):
+    email = get_user_email()
+    if email:
+      upload_info = self.get_uploads()
+      blob_info = upload_info[0]
+      type = blob_info.content_type
+            
+      title = self.request.get('title')
+      posted_image = PostedImage()
+      posted_image.title = title
+      posted_image.user = email
+      posted_image.image_url = images.get_serving_url(blob_info.key())
+      posted_image.put()
+      self.redirect('/')
+
+class PostedImage(ndb.Model):
+  title = ndb.StringProperty()
+  #image_url = ndb.StringProperty()
+########################################################################################
 class accountManagementHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
     if email:
-      upload_url = blobstore.create_upload_url('/upload_complete')
+      acctManage_url = blobstore.create_upload_url('/acctManageInfo')
       page_params = {
         'user_email': email,
         'login_url': users.create_login_url(),
         'logout_url': users.create_logout_url('/'),
-        'upload_url': upload_url
+        'acctManage_url': acctManage_url
       }
-      render_template(self, 'upload.html', page_params)
+      render_template(self, 'acctManage.html', page_params)
     else:
       self.redirect('/')
-app = webapp2.WSGIApplication([
-    ('/', MainHandler)
-], debug=True)
+
+########################################################################################
+
+app = webapp2.WSGIApplication([('/', MainHandler), ('/acctManage', accountManagementHandler), ('/acctManageInfo', InfoUploadHandler)], debug=True)

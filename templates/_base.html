@@ -1,13 +1,13 @@
 <html>
   <head>
-    <title>Your Pictures Are Dumb</title>
+    <title>PittCTF</title>
     <link rel="stylesheet" href="/stylesheets/style.css">
   </head>
   <body>
     <h1>PittCTF</h1>
     <a href="/">Main Page</a> |
     {% if user_email %}
-    <a href="/upload">Upload an Image</a> | <a href="{{ logout_url }}">Sign Out</a>
+    <a href="/acctManage">Manage Account</a> | <a href="{{ logout_url }}">Sign Out</a>
     {% else %}
     <a href="{{ login_url }}">Sign In</a>
     {% endif %}
