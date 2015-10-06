@@ -4,14 +4,16 @@
     <link rel="stylesheet" href="/stylesheets/style.css">
   </head>
   <body>
+    <ul class="nav navbar-nav">
+      <li><a href="/">Main Page</a></li>
+      {% if user_email %}
+      <li><a href="/acctManage">Manage Account</a></li>
+      <li><a href="{{ logout_url }}">Sign Out</a></li>
+      {% else %}
+      <li><a href="{{ login_url }}">Sign In</a></li>
+      {% endif %}
+    </ul>
     <h1>PittCTF</h1>
-    <a href="/">Main Page</a> |
-    {% if user_email %}
-    <a href="/acctManage">Manage Account</a> | <a href="{{ logout_url }}">Sign Out</a>
-    {% else %}
-    <a href="{{ login_url }}">Sign In</a>
-    {% endif %}
-    <br><br>
 
 {% block bodycontent %}{% endblock %}
 

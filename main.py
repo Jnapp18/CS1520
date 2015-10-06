@@ -19,8 +19,6 @@ import webapp2
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
 from google.appengine.ext import ndb
-from google.appengine.ext import blobstore
-from google.appengine.ext.webapp import blobstore_handlers
 
 
 class MainHandler(webapp2.RequestHandler):
@@ -48,25 +46,24 @@ def get_user_email():
 
 
 ###############################################################################
-class InfoUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
-  def post(self):
+class InfoUploadHandler(webapp2.RequestHandler):
+  def post(self): 
     email = get_user_email()
     if email:
-      posted_image = PostedImage()
-      posted_image.title = "test"
-      posted_image.put()
       self.redirect('/')
 
 
-class PostedImage(ndb.Model):
-  title = ndb.StringProperty()
-  #image_url = ndb.StringProperty()
+class accountModel(ndb.Model):
+  userID = ndb.StringProperty()
+  firstName = ndb.StringProperty()
+  lastName = ndb.StringProperty()
+  alias = ndb.StringProperty()
 ########################################################################################
 class accountManagementHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
     if email:
-      acctManage_url = blobstore.create_upload_url('/acctManageInfo')
+      acctManage_url = '/acctManageInfo'
       page_params = {
         'user_email': email,
         'login_url': users.create_login_url(),
@@ -74,6 +71,27 @@ class accountManagementHandler(webapp2.RequestHandler):
         'acctManage_url': acctManage_url
       }
       render_template(self, 'acctManage.html', page_params)
+    else:
+      self.redirect('/')
+  def post(self):
+    email = get_user_email()
+    if email: 
+      fname = self.request.get('fname')
+      lname = self.request.get('fname')
+      alias = self.request.get('alias')
+      AcctModel = accountModel()
+      AcctModel.userID = users.get_current_user().user_id()
+      AcctModel.fname = fname
+      AcctModel.lname = lname
+      AcctModel.alias = alias
+      AcctModel.put()
+      page_params = {
+        'userID': AcctModel.userID,
+        'fname': fname,
+        'lname': lname,
+        'alias': alias
+      }
+      render_template(self, 'acctManageInfo.html', page_params)
     else:
       self.redirect('/')
 

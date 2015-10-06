@@ -1,7 +1,8 @@
 body {
   font: 100% Roboto, Helvetica, sans-serif;
   color: #0066FF;
-  text-align: center; }
+  text-align: center;
+  background-color: #00001A; }
 
 p {
   font: 85% Roboto, Helvetica, sans-serif;
@@ -12,5 +13,12 @@ h1 {
   color: #0066FF;
   font-weight: bold;
   text-align: center; }
+
+li {
+  display: inline;
+  padding: 50px; }
+
+ul {
+  background-color: #F0F0F0; }
 
 /*# sourceMappingURL=style.css.map */
