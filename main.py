@@ -77,7 +77,7 @@ class accountManagementHandler(webapp2.RequestHandler):
     email = get_user_email()
     if email: 
       fname = self.request.get('fname')
-      lname = self.request.get('fname')
+      lname = self.request.get('lname')
       alias = self.request.get('alias')
       AcctModel = accountModel()
       AcctModel.userID = users.get_current_user().user_id()
@@ -86,7 +86,9 @@ class accountManagementHandler(webapp2.RequestHandler):
       AcctModel.alias = alias
       AcctModel.put()
       page_params = {
-        'userID': AcctModel.userID,
+        'login_url': users.create_login_url(),
+        'logout_url': users.create_logout_url('/'),
+        'user_email': email,
         'fname': fname,
         'lname': lname,
         'alias': alias
@@ -98,6 +100,7 @@ class accountManagementHandler(webapp2.RequestHandler):
 ########################################################################################
 mappings = [
   ('/', MainHandler),
+  ('/index', MainHandler),
   ('/acctManage', accountManagementHandler),
   ('/acctManageInfo', InfoUploadHandler)
 ]
