@@ -8,7 +8,11 @@
     <ul class="menuNav">
       <li><a href="/index">Main Page</a></li>
       {% if user_email %}
-      <li><a href="/acctManage">Manage Account</a></li>
+        <!-- {% if fname and lname and alias %} -->
+        <li><a href="/acctManage">Manage Account</a></li>
+        <!-- {% else %} -->
+        <li><a href="/acctManage">Manage Account</a></li>
+        <!-- {% endif %} -->
       <li><a href="{{ logout_url }}">Sign Out</a></li>
       {% else %}
       <li><a href="{{ login_url }}">Sign In</a></li>

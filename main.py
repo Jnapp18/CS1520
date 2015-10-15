@@ -23,9 +23,24 @@ from google.appengine.ext import ndb
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
+
         email = get_user_email()
+        fname = ""
+        lname = ""
+        alias = ""
+        if email:
+          qry1 = accountModel.query()
+          qry2 = qry1.filter(accountModel.userID == users.get_current_user().user_id()).fetch(1)
+          for q in qry2:
+            if q.userID == users.get_current_user().user_id():
+              fname = q.firstName
+              lname = q.lastName
+              alias = q.alias
         page_params = {
           'user_email': email,
+          'firstName': fname,
+          'lastName': lname,
+          'alias': alias,
           'login_url': users.create_login_url(),
           'logout_url': users.create_logout_url('/')
         }
@@ -58,6 +73,7 @@ class accountModel(ndb.Model):
   firstName = ndb.StringProperty()
   lastName = ndb.StringProperty()
   alias = ndb.StringProperty()
+
 ########################################################################################
 class accountManagementHandler(webapp2.RequestHandler):
   def get(self):
@@ -81,8 +97,8 @@ class accountManagementHandler(webapp2.RequestHandler):
       alias = self.request.get('alias')
       AcctModel = accountModel()
       AcctModel.userID = users.get_current_user().user_id()
-      AcctModel.fname = fname
-      AcctModel.lname = lname
+      AcctModel.firstName = fname
+      AcctModel.lastName = lname
       AcctModel.alias = alias
       AcctModel.put()
       page_params = {
