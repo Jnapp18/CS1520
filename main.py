@@ -29,13 +29,12 @@ class MainHandler(webapp2.RequestHandler):
         lname = ""
         alias = ""
         if email:
-          qry1 = accountModel.query()
-          qry2 = qry1.filter(accountModel.userID == users.get_current_user().user_id()).fetch(1)
-          for q in qry2:
-            if q.userID == users.get_current_user().user_id():
-              fname = q.firstName
-              lname = q.lastName
-              alias = q.alias
+          print 'fix'
+          qry = accountModel.get_by_id(users.get_current_user().user_id())
+          if qry:
+            fname = qry.firstName
+            lname = qry.lastName
+            alias = qry.alias
         page_params = {
           'user_email': email,
           'firstName': fname,
@@ -45,7 +44,6 @@ class MainHandler(webapp2.RequestHandler):
           'logout_url': users.create_logout_url('/')
         }
         render_template(self, 'index.html', page_params)
-
 
 def render_template(handler, templatename, templatevalues={}):
   path = os.path.join(os.path.dirname(__file__), 'templates/' + templatename)
@@ -61,15 +59,31 @@ def get_user_email():
 
 
 ###############################################################################
-class InfoUploadHandler(webapp2.RequestHandler):
-  def post(self): 
+class accountManageDisplay(webapp2.RequestHandler):
+  def get(self):
     email = get_user_email()
+    fname = ""
+    lname = ""
+    alias = ""
     if email:
-      self.redirect('/')
+      print 'fix'
+      qry = accountModel.get_by_id(users.get_current_user().user_id())
+      if qry:
+        fname = qry.firstName
+        lname = qry.lastName
+        alias = qry.alias
+    page_params = {
+      'user_email': email,
+      'firstName': fname,
+      'lastName': lname,
+      'alias': alias,
+      'login_url': users.create_login_url(),
+      'logout_url': users.create_logout_url('/')
+    }
+    render_template(self, 'acctManageInfo.html', page_params)
 
 
 class accountModel(ndb.Model):
-  userID = ndb.StringProperty()
   firstName = ndb.StringProperty()
   lastName = ndb.StringProperty()
   alias = ndb.StringProperty()
@@ -95,8 +109,8 @@ class accountManagementHandler(webapp2.RequestHandler):
       fname = self.request.get('fname')
       lname = self.request.get('lname')
       alias = self.request.get('alias')
-      AcctModel = accountModel()
-      AcctModel.userID = users.get_current_user().user_id()
+
+      AcctModel = accountModel(id=users.get_current_user().user_id())
       AcctModel.firstName = fname
       AcctModel.lastName = lname
       AcctModel.alias = alias
@@ -105,8 +119,8 @@ class accountManagementHandler(webapp2.RequestHandler):
         'login_url': users.create_login_url(),
         'logout_url': users.create_logout_url('/'),
         'user_email': email,
-        'fname': fname,
-        'lname': lname,
+        'firstName': fname,
+        'lastName': lname,
         'alias': alias
       }
       render_template(self, 'acctManageInfo.html', page_params)
@@ -118,6 +132,6 @@ mappings = [
   ('/', MainHandler),
   ('/index', MainHandler),
   ('/acctManage', accountManagementHandler),
-  ('/acctManageInfo', InfoUploadHandler)
+  ('/acctManageInfo', accountManageDisplay)
 ]
 app = webapp2.WSGIApplication(mappings, debug=True)
