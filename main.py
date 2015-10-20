@@ -38,7 +38,7 @@ class lobbyAccessModel(ndb.Model):
 #Challenge management table
 class challengeModel(ndb.Model):
   challengeID = ndb.IntegerProperty()
-  ownerID = ndb.IntegerProperty()
+  ownerID = ndb.StringProperty()
   question = ndb.TextProperty()
   answer = ndb.TextProperty()
   attachments = ndb.BlobProperty
@@ -73,25 +73,25 @@ def get_user_email():
 #Home page handler.
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        email = get_user_email()
-        fname = ""
-        lname = ""
-        username = ""
-        if email:
-          qry = accountModel.get_by_id(users.get_current_user().user_id())
-          if qry:
-            fname = qry.firstName
-            lname = qry.lastName
-            username = qry.username
-        page_params = {
-          'user_email': email,
-          'firstName': fname,
-          'lastName': lname,
-          'username': username,
-          'login_url': users.create_login_url(),
-          'logout_url': users.create_logout_url('/')
-        }
-        render_template(self, 'index.html', page_params)
+      email = get_user_email()
+      fname = ""
+      lname = ""
+      username = ""
+      if email:
+        qry = accountModel.get_by_id(users.get_current_user().user_id())
+        if qry:
+          fname = qry.firstName
+          lname = qry.lastName
+          username = qry.username
+      page_params = {
+        'user_email': email,
+        'firstName': fname,
+        'lastName': lname,
+        'username': username,
+        'login_url': users.create_login_url(),
+        'logout_url': users.create_logout_url('/')
+      }
+      render_template(self, 'index.html', page_params)
 #"My Account" page handler for editing information
 class accountManageDisplay(webapp2.RequestHandler):
   def get(self):
@@ -195,6 +195,79 @@ class ChallengeHandler(webapp2.RequestHandler):
           'logout_url': users.create_logout_url('/')
         }
         render_template(self, 'challenges.html', page_params)
+class manageChallengeHandler(webapp2.RequestHandler):
+  def get(self):
+    email = get_user_email()
+    fname = ""
+    lname = ""
+    username = ""
+    if email:
+      qry = accountModel.get_by_id(users.get_current_user().user_id())
+      if qry:
+        fname = qry.firstName
+        lname = qry.lastName
+        username = qry.username
+    page_params = {
+      'user_email': email,
+      'firstName': fname,
+      'lastName': lname,
+      'username': username,
+      'login_url': users.create_login_url(),
+      'logout_url': users.create_logout_url('/')
+    }
+    render_template(self, 'manageChallenges.html', page_params)
+    if email:
+      qry2 = challengeModel.query(challengeModel.ownerID == users.get_current_user().user_id())
+      if qry2:
+        self.response.out.write('''<table class="challenge-table" align="center" style="margin: 0px auto;"><tr><th>Question</th><th>Answer</th><th>Points</th></tr>''')
+        for q in qry2:
+          self.response.out.write('''<tr><td data-th="Question">%s</td><td data-th="Answer">%s</td><td data-th="Points">%d</td></tr>'''%(q.question, q.answer, q.score))
+        self.response.out.write('''</table>''')
+    else:
+      self.redirect('/')
+class uploadChallengeHandler(webapp2.RequestHandler):
+  def get(self):
+    email = get_user_email()
+    if email:
+      page_params = {
+        'user_email': email,
+        'login_url': users.create_login_url(),
+        'logout_url': users.create_logout_url('/')
+      }
+      render_template(self, 'uploadChallenge.html', page_params)
+    else:
+      self.redirect('/')
+  def post(self):
+    email = get_user_email()
+    fname = ""
+    lname = ""
+    username = ""
+    if email:
+      qry = accountModel.get_by_id(users.get_current_user().user_id())
+      if qry:
+        fname = qry.firstName
+        lname = qry.lastName
+        username = qry.username
+      #updating the database with challenge information
+      Challenge = challengeModel()
+      Challenge.challengeID = 1
+      Challenge.ownerID = users.get_current_user().user_id()
+      Challenge.question = self.request.get('question')
+      Challenge.answer = self.request.get('answer')
+      Challenge.attachments = 'none'
+      Challenge.score = int(self.request.get('points'))
+      Challenge.put()
+      page_params = {
+        'login_url': users.create_login_url(),
+        'logout_url': users.create_logout_url('/'),
+        'user_email': email,
+        'firstName': fname,
+        'lastName': lname,
+        'username': username
+      }
+      render_template(self, 'challenges.html', page_params)
+    else:
+      self.redirect('/')
 ################## End Page Handlers ####################
 
 
@@ -208,6 +281,8 @@ mappings = [
   ('/index', MainHandler),
   ('/Lobbies', LobbyHandler),
   ('/Challenges', ChallengeHandler),
+  ('/manageChallenges', manageChallengeHandler),
+  ('/uploadChallenge', uploadChallengeHandler),
   ('/acctManage', accountManagementHandler),
   ('/acctManageInfo', accountManageDisplay)
 ]
