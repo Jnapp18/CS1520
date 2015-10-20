@@ -12,7 +12,7 @@ indexes:
 
 - kind: accountModel
   properties:
-  - name: alias
+  - name: username
   - name: firstName
   - name: lastName
   - name: userID
