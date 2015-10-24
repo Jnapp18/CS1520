@@ -1,0 +1,15 @@
+{% extends "_challenges.html" %}
+{% block bodycontent %}
+<h2>Challenge Upload</h2>
+Challenge Question:
+<input name="question" type="text"><br><br><br>
+Answer:
+<input name="answer" type="text"><br><br><br>
+Score Reward:
+<input name="answer" type="text"><br><br><br>
+<form method="post" enctype="multipart/form-data" action="{{upload_url}}">
+Zip File:<br>
+<input name="file" type="file"><br><br><br>
+<input type="submit">
+</form>
+{% endblock %}
