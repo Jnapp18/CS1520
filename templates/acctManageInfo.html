@@ -1,7 +1,9 @@
 {% extends "_base.html" %}
 {% block bodycontent %}
 <h2>Manage Account</h2>
-First Name: <p>{{ fname }}</p>
-Last Name: <p>{{ lname }}</p>
-Alias: <p>{{ alias }}</p>
+<p id="acct"><b>Email Address:</b> <i>{{ user_email}}</i></p>
+<p id="acct"><b>First Name:</b> <i>{{ firstName }}</i></p>
+<p id="acct"><b>Last Name:</b> <i>{{ lastName }}</i></p>
+<p id="acct"><b>Username:</b> <i>{{ username }}</i></p>
+<li><a href="/acctManage">Edit Account</a></li>
 {% endblock %}

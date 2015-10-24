@@ -4,17 +4,22 @@
     <link rel="stylesheet" href="/stylesheets/style.css">
   </head>
   <body>
-    <ul class="nav navbar-nav">
-      <li><a href="/">Main Page</a></li>
+    <h1>PittCTF</h1>
+    <ul class="menuNav">
+      <li><a href="/index">Home</a></li>
       {% if user_email %}
-      <li><a href="/acctManage">Manage Account</a></li>
+        <li><a href="/Lobbies">Lobbies</a></li>
+        <li><a href="/Challenges">Challenges</a></li>
+        {% if firstName and lastName and username %}
+        <li><a href="/acctManageInfo">Manage Account</a></li>
+        {% else %}
+        <li><a href="/acctManage">My Account</a></li>
+        {% endif %}
       <li><a href="{{ logout_url }}">Sign Out</a></li>
       {% else %}
       <li><a href="{{ login_url }}">Sign In</a></li>
       {% endif %}
     </ul>
-    <h1>PittCTF</h1>
-
 {% block bodycontent %}{% endblock %}
 
   </body>
