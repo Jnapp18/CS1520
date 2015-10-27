@@ -27,7 +27,7 @@ class accountModel(ndb.Model):
   firstName = ndb.StringProperty()
   lastName = ndb.StringProperty()
   username = ndb.StringProperty()
-  score = ndb.IntegerProperty()
+  score = ndb.IntegerProperty(default=0)
 #Lobby management table
 class lobbyModel(ndb.Model):
   lobbyID = ndb.IntegerProperty()
@@ -283,16 +283,8 @@ class leaderboardHandler(webapp2.RequestHandler):
         lname = ""
         username = ""
         rank = 0
-        player1 = accountModel(firstName='abc', lastName='def', username='ghi', score=10)
-        player2 = accountModel(firstName='jkl', lastName='mno', username='pqr', score=12)
-        player3 = accountModel(firstName='stu', lastName='vwx', username='yx', score=15)
-        player1.put()
-        player2.put()
-        player3.put()
-
         results = accountModel.query()
         results = results.order(-accountModel.score)
-        #results = results.fetch(10)
 
         if email:
             qry = accountModel.get_by_id(users.get_current_user().user_id())
