@@ -1,0 +1,19 @@
+{% extends "_leaderboard.html" %}
+{% block bodycontent %}
+<h2>Leaderboard</h2>
+<p id="acct">High Scores</p>
+    <table class="challenge-table" align="center" style="margin: 0px auto;">
+        <tr>
+            <th>Rank</th>
+            <th>Username</th>
+            <th>Score</th>
+        </tr>
+        {% for player in board %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ player.username }}</td>
+                <td>{{ player.score }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

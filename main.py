@@ -19,12 +19,15 @@ import webapp2
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
 from google.appengine.ext import ndb
+from google.appengine.ext import blobstore
+from google.appengine.ext.webapp import blobstore_handlers
 ################## NDB Models ####################
 #Account management table
 class accountModel(ndb.Model):
   firstName = ndb.StringProperty()
   lastName = ndb.StringProperty()
   username = ndb.StringProperty()
+  score = ndb.IntegerProperty()
 #Lobby management table
 class lobbyModel(ndb.Model):
   lobbyID = ndb.IntegerProperty()
@@ -174,6 +177,7 @@ class LobbyHandler(webapp2.RequestHandler):
           'logout_url': users.create_logout_url('/')
         }
         render_template(self, 'lobbies.html', page_params)
+
 class ChallengeHandler(webapp2.RequestHandler):
     def get(self):
         email = get_user_email()
@@ -195,6 +199,7 @@ class ChallengeHandler(webapp2.RequestHandler):
           'logout_url': users.create_logout_url('/')
         }
         render_template(self, 'challenges.html', page_params)
+
 class manageChallengeHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
@@ -225,7 +230,8 @@ class manageChallengeHandler(webapp2.RequestHandler):
         self.response.out.write('''</table>''')
     else:
       self.redirect('/')
-class uploadChallengeHandler(webapp2.RequestHandler):
+
+class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
   def get(self):
     email = get_user_email()
     if email:
@@ -249,12 +255,13 @@ class uploadChallengeHandler(webapp2.RequestHandler):
         lname = qry.lastName
         username = qry.username
       #updating the database with challenge information
+      uploaded_file = self.get_uploads()
       Challenge = challengeModel()
       Challenge.challengeID = 1
       Challenge.ownerID = users.get_current_user().user_id()
       Challenge.question = self.request.get('question')
       Challenge.answer = self.request.get('answer')
-      Challenge.attachments = 'none'
+      Challenge.attachments = uploaded_file
       Challenge.score = int(self.request.get('points'))
       Challenge.put()
       page_params = {
@@ -268,6 +275,42 @@ class uploadChallengeHandler(webapp2.RequestHandler):
       render_template(self, 'challenges.html', page_params)
     else:
       self.redirect('/')
+
+class leaderboardHandler(webapp2.RequestHandler):
+    def get(self):
+        email = get_user_email()
+        fname = ""
+        lname = ""
+        username = ""
+        rank = 0
+        player1 = accountModel(firstName='abc', lastName='def', username='ghi', score=10)
+        player2 = accountModel(firstName='jkl', lastName='mno', username='pqr', score=12)
+        player3 = accountModel(firstName='stu', lastName='vwx', username='yx', score=15)
+        player1.put()
+        player2.put()
+        player3.put()
+
+        results = accountModel.query()
+        results = results.order(-accountModel.score)
+        #results = results.fetch(10)
+
+        if email:
+            qry = accountModel.get_by_id(users.get_current_user().user_id())
+            if qry:
+                fname = qry.firstName
+                lname = qry.lastName
+                username = qry.username
+        page_params = {
+            'user_email': email,
+            'firstName': fname,
+            'lastName': lname,
+            'username': username,
+            'login_url': users.create_login_url(),
+            'logout_url': users.create_logout_url('/'),
+            'board': results,
+            'rank': rank
+        }
+        render_template(self, 'leaderboard.html', page_params)
 ################## End Page Handlers ####################
 
 
@@ -284,6 +327,7 @@ mappings = [
   ('/manageChallenges', manageChallengeHandler),
   ('/uploadChallenge', uploadChallengeHandler),
   ('/acctManage', accountManagementHandler),
-  ('/acctManageInfo', accountManageDisplay)
+  ('/acctManageInfo', accountManageDisplay),
+  ('/leaderboard', leaderboardHandler)
 ]
 app = webapp2.WSGIApplication(mappings, debug=True)

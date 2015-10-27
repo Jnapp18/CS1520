@@ -1,6 +1,6 @@
-{% extends "_base.html" %}
+{% extends "_challenges.html" %}
 {% block bodycontent %}
-<h2>Upload Challenge</h2>
+<h2>Challenge Upload</h2>
 <form method="post" enctype="multipart/form-data" action="{{upload_url}}">
 Question:<br>
 <input name="question" type="text"><br><br><br>
@@ -8,6 +8,8 @@ Answer:<br>
 <input name="answer" type="text"><br><br><br>
 Points:<br>
 <input name="points" type="number"><br><br><br>
+Zip File:<br>
+<input name="file" type="file"><br><br><br>
 <input type="submit">
 </form>
 {% endblock %}
