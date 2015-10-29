@@ -1,7 +1,7 @@
 <html>
   <head>
     <title>PittCTF</title>
-    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
   </head>
   <body>
     <h1>PittCTF</h1>
@@ -10,7 +10,7 @@
       {% if user_email %}
         <li><a href="/Lobbies">Lobbies</a></li>
         <li><a href="/Challenges">Challenges</a></li>
-        <li><a href="/leaderboard">Leaderboard</a></li>
+        <li><a href="/leaderboard" class="current">Leaderboard</a></li>
         {% if firstName and lastName and username %}
         <li><a href="/acctManageInfo">Manage Account</a></li>
         {% else %}

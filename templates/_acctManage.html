@@ -9,12 +9,12 @@
       <li><a href="/index">Home</a></li>
       {% if user_email %}
         <li><a href="/Lobbies">Lobbies</a></li>
-        <li><a href="/Challenges" class="current">Challenges</a></li>
+        <li><a href="/Challenges">Challenges</a></li>
         <li><a href="/leaderboard">Leaderboard</a></li>
         {% if firstName and lastName and username %}
-        <li><a href="/acctManageInfo">Manage Account</a></li>
+        <li><a href="/acctManageInfo" class="current">Manage Account</a></li>
         {% else %}
-        <li><a href="/acctManage">My Account</a></li>
+        <li><a href="/acctManage" class="current">My Account</a></li>
         {% endif %}
       <li><a href="{{ logout_url }}">Sign Out</a></li>
       {% else %}
@@ -22,5 +22,6 @@
       {% endif %}
     </ul>
 {% block bodycontent %}{% endblock %}
+
   </body>
 </html>
