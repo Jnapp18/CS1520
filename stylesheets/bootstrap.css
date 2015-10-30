@@ -11,6 +11,13 @@
   -o-background-size: cover;
   background-size: cover;
 }
+.contentbkg
+{
+  margin-top: 70px;
+  padding-top: 5px;
+  padding-bottom: 10px;
+  background: rgba(240, 241, 238, 0.95);
+}
 
 /* line 13, style.sass */
 p {
