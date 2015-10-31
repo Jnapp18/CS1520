@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-{% extends "_challenges.html" %}
-{% block bodycontent %}
-<h2>Challenge Upload</h2>
-Challenge Question:
-<input name="question" type="text"><br><br><br>
-Answer:
-<input name="answer" type="text"><br><br><br>
-Score Reward:
-<input name="answer" type="text"><br><br><br>
-<form method="post" enctype="multipart/form-data" action="{{upload_url}}">
-=======
 {% extends "_base.html" %}
 {% block bodycontent %}
 <h2>Challenge Upload</h2>
@@ -20,7 +8,6 @@ Answer:<br>
 <input name="answer" type="text"><br><br><br>
 Points:<br>
 <input name="points" type="number"><br><br><br>
->>>>>>> 5a1c956913e9992a10e76399bb67a20564cfe58b
 Zip File:<br>
 <input name="file" type="file"><br><br><br>
 <input type="submit">
