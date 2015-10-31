@@ -1,7 +1,11 @@
 <html>
   <head>
     <title>PittCTF</title>
+<<<<<<< HEAD
     <link rel="stylesheet" href="/stylesheets/style.css">
+=======
+    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+>>>>>>> 5a1c956913e9992a10e76399bb67a20564cfe58b
   </head>
   <body>
     <h1>PittCTF</h1>
@@ -9,7 +13,12 @@
       <li><a href="/index">Home</a></li>
       {% if user_email %}
         <li><a href="/Lobbies">Lobbies</a></li>
+<<<<<<< HEAD
         <li><a href="/Challenges">Challenges</a></li>
+=======
+        <li><a href="/Challenges" class="current">Challenges</a></li>
+        <li><a href="/leaderboard">Leaderboard</a></li>
+>>>>>>> 5a1c956913e9992a10e76399bb67a20564cfe58b
         {% if firstName and lastName and username %}
         <li><a href="/acctManageInfo">Manage Account</a></li>
         {% else %}
@@ -21,6 +30,9 @@
       {% endif %}
     </ul>
 {% block bodycontent %}{% endblock %}
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5a1c956913e9992a10e76399bb67a20564cfe58b
   </body>
 </html>

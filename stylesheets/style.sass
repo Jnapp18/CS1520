@@ -1,32 +1,61 @@
 $font-stack: Roboto, Helvetica, sans-serif
 $pinkColor: #FB6964
+<<<<<<< HEAD
 body
 	font: 100% $font-stack
 	color: #1352A2
 	text-align: center
 	background-color: #F0F1EE
+=======
+$dark: #333332
+$gold: #FFD464
+$offwhite: #F0F1EE
+$blue: #1352A2
+$breakpoint-alpha: 480px
+body
+	font: 100% $font-stack
+	color: $blue
+	text-align: center
+	background-color: $offwhite
+>>>>>>> 5a1c956913e9992a10e76399bb67a20564cfe58b
 p
 	text-align: center
 	margin-right: 10%
 	margin-left: 10%
 	font: 30px $font-stack
+<<<<<<< HEAD
 	color: #1352A2
+=======
+	color: $blue
+>>>>>>> 5a1c956913e9992a10e76399bb67a20564cfe58b
 #descrip
 	text-align: left
 	margin-right: 10%
 	margin-left: 10%
 	font: 20px $font-stack
+<<<<<<< HEAD
 	color: #1352A2
 #acct
 	text-align: center
 	font: 20px Roboto, Helvetica, sans-serif
 	color: #1352A2
+=======
+	color: $blue
+#acct
+	text-align: center
+	font: 20px Roboto, Helvetica, sans-serif
+	color: $blue
+>>>>>>> 5a1c956913e9992a10e76399bb67a20564cfe58b
 hr
 	margin-right: 10%
 	margin-left: 10%
 h1
 	font: 100px $font-stack
+<<<<<<< HEAD
 	color: #1352A2
+=======
+	color: $blue
+>>>>>>> 5a1c956913e9992a10e76399bb67a20564cfe58b
 	font-weight: bold
 	text-align: center
 li
@@ -37,13 +66,81 @@ li
 	font-weight: bold
 	font: 20px $font-stack
 .menuNav
+<<<<<<< HEAD
 	background-color: #333332
+=======
+	background-color: $dark
+>>>>>>> 5a1c956913e9992a10e76399bb67a20564cfe58b
 	border-top-left-radius: 5px
 	border-bottom-left-radius: 5px
 	border-top-right-radius: 5px
 	border-bottom-right-radius: 5px
 	float: center
 	padding: 20px 20px 20px 20px
+<<<<<<< HEAD
 a
 	text-decoration: none
 	color: #FFD464
+=======
+.current
+	text-decoration: underline
+	text-decoration-color: $pinkColor
+a
+	text-decoration: none
+	color: $gold
+
+
+
+// adjust to your needs
+.challenge-table
+	text-align: center
+	margin: 1em 0
+	min-width: 300px
+	border-collapse: collapse
+// adjust to your needs
+table
+	align: center
+tr
+	border-top: 1px solid $offwhite
+	border-bottom: 1px solid $offwhite
+th
+	display: none
+// for accessibility, use a visually hidden method here instead! Thanks, reddit!
+td
+	display: block
+	&:first-child
+		padding-top: .5em
+	&:last-child
+		padding-bottom: .5em
+// who knew you could do this? The internet, that's who.
+	font-weight: bold
+// optional stuff to make it look nicer
+	width: 6.5em
+// magic number :( adjust according to your own content
+	display: inline-block
+// end options
+	@media (min-width: $breakpoint-alpha)
+		display: none
+th, td
+	text-align: left
+	@media (min-width: $breakpoint-alpha)
+		display: table-cell
+		padding: .25em .5em
+	&:first-child
+		padding-left: 0
+	&:last-child
+		padding-right: 0
+.challenge-table
+	background: $dark
+	color: $offwhite
+	border-radius: .4em
+	overflow: hidden
+tr
+	border-color: lighten($dark, 10%)
+th, td
+	margin: .5em 1em
+	@media (min-width: $breakpoint-alpha)
+		padding: 1em !important
+th, td:before
+	color: $gold
+>>>>>>> 5a1c956913e9992a10e76399bb67a20564cfe58b

@@ -1,0 +1,11 @@
+to-do
+
+Milestone 2
+-Sanitize inputs
+-lobby needs to get developed
+-bootstrap implemented
+-all existing features refines
+
+Milestone 3
+- flagging system to prevent inappropriate uploads
+- public/private lobbies if not implemented
