@@ -1,28 +1,30 @@
-import os
-import webapp2
-from google.appengine.ext.webapp import template
-from google.appengine.api import users
 from google.appengine.ext import ndb
-from google.appengine.ext import blobstore
-from google.appengine.ext.webapp import blobstore_handlers
+
+
 ################## NDB Models ####################
-#Account management table
+# Account management table
 class accountModel(ndb.Model):
   firstName = ndb.StringProperty()
   lastName = ndb.StringProperty()
   username = ndb.StringProperty()
   score = ndb.IntegerProperty(default=0)
-#Lobby management table
+
+
+# Lobby management table
 class lobbyModel(ndb.Model):
   lobbyID = ndb.IntegerProperty()
   lobbyName = ndb.TextProperty()
   publicBool = ndb.BooleanProperty()
   ownerID = ndb.IntegerProperty()
-#Lobby Access table
+
+
+# Lobby Access table
 class lobbyAccessModel(ndb.Model):
   lobbyID = ndb.IntegerProperty()
   userID = ndb.IntegerProperty()
-#Challenge management table
+
+
+# Challenge management table
 class challengeModel(ndb.Model):
   challengeID = ndb.IntegerProperty()
   ownerID = ndb.StringProperty()
@@ -30,13 +32,17 @@ class challengeModel(ndb.Model):
   answer = ndb.TextProperty()
   attachments = ndb.BlobProperty
   score = ndb.IntegerProperty()
-#Challenge Access table
+
+
+# Challenge Access table
 class challengeAccessModel(ndb.Model):
   challengeID = ndb.IntegerProperty()
   lobbyID = ndb.IntegerProperty()
-#progress tracking table
+
+
+# progress tracking table
 class progressTable(ndb.Model):
   userID = ndb.IntegerProperty()
   lobbyID = ndb.IntegerProperty()
   challengeID = ndb.IntegerProperty()
-################## End NDB Models ####################
+  ################## End NDB Models ####################

@@ -1,26 +1,26 @@
 <html>
-  <head>
-    <title>PittCTF</title>
-    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
-  </head>
-  <body>
-    <h1>PittCTF</h1>
-    <ul class="menuNav">
-      <li><a href="/index">Home</a></li>
-      {% if user_email %}
-        <li><a href="/Lobbies">Lobbies</a></li>
-        <li><a href="/Challenges" class="current">Challenges</a></li>
-        <li><a href="/leaderboard">Leaderboard</a></li>
-        {% if firstName and lastName and username %}
-        <li><a href="/acctManageInfo">Manage Account</a></li>
-        {% else %}
-        <li><a href="/acctManage">My Account</a></li>
-        {% endif %}
-      <li><a href="{{ logout_url }}">Sign Out</a></li>
-      {% else %}
-      <li><a href="{{ login_url }}">Sign In</a></li>
-      {% endif %}
-    </ul>
+<head>
+  <title>PittCTF</title>
+  <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+</head>
+<body>
+<h1>PittCTF</h1>
+<ul class="menuNav">
+  <li><a href="/index">Home</a></li>
+  {% if user_email %}
+    <li><a href="/Lobbies">Lobbies</a></li>
+    <li><a href="/Challenges" class="current">Challenges</a></li>
+    <li><a href="/leaderboard">Leaderboard</a></li>
+    {% if firstName and lastName and username %}
+      <li><a href="/acctManageInfo">Manage Account</a></li>
+    {% else %}
+      <li><a href="/acctManage">My Account</a></li>
+    {% endif %}
+    <li><a href="{{ logout_url }}">Sign Out</a></li>
+  {% else %}
+    <li><a href="{{ login_url }}">Sign In</a></li>
+  {% endif %}
+</ul>
 {% block bodycontent %}{% endblock %}
-  </body>
+</body>
 </html>

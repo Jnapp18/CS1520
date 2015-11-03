@@ -1,17 +1,20 @@
 {% extends "_base.html" %}
 {% block bodycontent %}
-<div class="contentbkg">
-	<h2 align="center">Challenge Upload</h2>
-	<form align="center" method="post" enctype="multipart/form-data" action="{{upload_url}}">
-	Question:<br>
-	<input name="question" type="text"><br><br><br>
-	Answer:<br>
-	<input name="answer" type="text"><br><br><br>
-	Points:<br>
-	<input name="points" type="number"><br><br><br>
-	Zip File:<br>
-	<div align="center"><input name="file" type="file"></div><br><br>
-	<input type="submit">
-	</form>
-</div>
+  <div class="contentbkg">
+    <h2 align="center">Challenge Upload</h2>
+
+    <form align="center" method="post" enctype="multipart/form-data" action="{{ upload_url }}">
+      Question:<br>
+      <input name="question" type="text"><br><br><br>
+      Answer:<br>
+      <input name="answer" type="text"><br><br><br>
+      Points:<br>
+      <input name="points" type="number"><br><br><br>
+      Zip File:<br>
+
+      <div align="center"><input name="file" type="file"></div>
+      <br><br>
+      <input type="submit">
+    </form>
+  </div>
 {% endblock %}
