@@ -17,7 +17,7 @@
 import os
 import webapp2
 from models import *
-from helperFuntions import *
+from helperFunctions import *
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
 from google.appengine.ext import ndb
