@@ -1,4 +1,16 @@
 {% extends "_base.html" %}
 {% block bodycontent %}
-<h2>Challenges:</h2>
+<div class="contentbkg">
+	<h2 align="center">Challenges:</h2>
+
+<!-- need to replicate the code from line 164 of main.py   It will be very similar to leaderboard
+	qry2 = challengeModel.query(challengeModel.ownerID == users.get_current_user().user_id())
+      if qry2:
+        self.response.out.write('''<div><table class="challenge-table" align="center" style="margin: 0px auto;"><tr><th>Question</th><th>Answer</th><th>Points</th></tr>''')
+        for q in qry2:
+          self.response.out.write('''<tr><td data-th="Question">%s</td><td data-th="Answer">%s</td><td data-th="Points">%d</td></tr>'''%(q.question, q.answer, q.score))
+        self.response.out.write('''</table>''')
+
+Need to loop through challenges and print out name, question, answer, points (name is currently not in challenge model)--> 
+</div>
 {% endblock %}

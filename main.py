@@ -16,60 +16,14 @@
 #
 import os
 import webapp2
+from models import *
+from helperFuntions import *
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.ext import blobstore
 from google.appengine.ext.webapp import blobstore_handlers
-################## NDB Models ####################
-#Account management table
-class accountModel(ndb.Model):
-  firstName = ndb.StringProperty()
-  lastName = ndb.StringProperty()
-  username = ndb.StringProperty()
-  score = ndb.IntegerProperty(default=0)
-#Lobby management table
-class lobbyModel(ndb.Model):
-  lobbyID = ndb.IntegerProperty()
-  lobbyName = ndb.TextProperty()
-  publicBool = ndb.BooleanProperty()
-  ownerID = ndb.IntegerProperty()
-#Lobby Access table
-class lobbyAccessModel(ndb.Model):
-  lobbyID = ndb.IntegerProperty()
-  userID = ndb.IntegerProperty()
-#Challenge management table
-class challengeModel(ndb.Model):
-  challengeID = ndb.IntegerProperty()
-  ownerID = ndb.StringProperty()
-  question = ndb.TextProperty()
-  answer = ndb.TextProperty()
-  attachments = ndb.BlobProperty
-  score = ndb.IntegerProperty()
-#Challenge Access table
-class challengeAccessModel(ndb.Model):
-  challengeID = ndb.IntegerProperty()
-  lobbyID = ndb.IntegerProperty()
-#progress tracking table
-class progressTable(ndb.Model):
-  userID = ndb.IntegerProperty()
-  lobbyID = ndb.IntegerProperty()
-  challengeID = ndb.IntegerProperty()
-################## End NDB Models ####################
 
-################## Helper Functions ####################
-def render_template(handler, templatename, templatevalues={}):
-  path = os.path.join(os.path.dirname(__file__), 'templates/' + templatename)
-  html = template.render(path, templatevalues)
-  handler.response.out.write(html)
-
-def get_user_email():
-  result = None
-  user = users.get_current_user()
-  if user:
-    result = user.email()
-  return result
-################## End Helper Functions ####################
 
 ################## Page Handlers ####################
 #Here we basically gather information, and send that information into a template so a page can be rendered.
@@ -224,7 +178,7 @@ class manageChallengeHandler(webapp2.RequestHandler):
     if email:
       qry2 = challengeModel.query(challengeModel.ownerID == users.get_current_user().user_id())
       if qry2:
-        self.response.out.write('''<table class="challenge-table" align="center" style="margin: 0px auto;"><tr><th>Question</th><th>Answer</th><th>Points</th></tr>''')
+        self.response.out.write('''<div><table class="challenge-table" align="center" style="margin: 0px auto;"><tr><th>Question</th><th>Answer</th><th>Points</th></tr>''')
         for q in qry2:
           self.response.out.write('''<tr><td data-th="Question">%s</td><td data-th="Answer">%s</td><td data-th="Points">%d</td></tr>'''%(q.question, q.answer, q.score))
         self.response.out.write('''</table>''')
