@@ -1,13 +1,23 @@
 {% extends "_base.html" %}
 {% block bodycontent %}
+<center>
+<div class="contentbkg">
 <h2>Manage Account</h2>
+</div>
 <form method="post" enctype="multipart/form-data" action="{{upload_url}}">
+<span style="background-color:#333332; color:#ffd464">
 First Name<br>
+</span>
 <input name="fname" type="text"><br><br><br>
+<span style="background-color:#333332; color:#ffd464">
 Last Name:<br>
+</span>
 <input name="lname" type="text"><br><br><br>
+<span style="background-color:#333332; color:#ffd464">
 Username:<br>
+</span>
 <input name="username" type="text"><br><br><br>
 <input type="submit">
 </form>
+</center>
 {% endblock %}

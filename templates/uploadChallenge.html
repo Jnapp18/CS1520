@@ -1,15 +1,28 @@
 {% extends "_base.html" %}
 {% block bodycontent %}
-<h2>Challenge Upload</h2>
+<div class="contentbkg">
+<h2 align="center">Challenge Upload</h2>
+</div>
+<center>
 <form method="post" enctype="multipart/form-data" action="{{upload_url}}">
+<span style="background-color:#333332; color:#ffd464">
 Question:<br>
+</span>
 <input name="question" type="text"><br><br><br>
+<span style="background-color:#333332; color:#ffd464">
 Answer:<br>
+</span>
 <input name="answer" type="text"><br><br><br>
+<span style="background-color:#333332; color:#ffd464">
 Points:<br>
+</span>
 <input name="points" type="number"><br><br><br>
+<span style="background-color:#333332; color:#ffd464">
 Zip File:<br>
-<input name="file" type="file"><br><br><br>
+</span>
+<span style="color:#ffd464">
+<input style="background-color:#333332"name="file" type="file"><br><br><br>
+</span>
 <input type="submit">
-</form>
+</form></center>
 {% endblock %}

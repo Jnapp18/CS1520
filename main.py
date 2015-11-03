@@ -16,7 +16,6 @@
 #
 import os
 import webapp2
-import random
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -29,7 +28,6 @@ class accountModel(ndb.Model):
   lastName = ndb.StringProperty()
   username = ndb.StringProperty()
   score = ndb.IntegerProperty(default=0)
-
 #Lobby management table
 class lobbyModel(ndb.Model):
   lobbyID = ndb.IntegerProperty()
@@ -97,7 +95,6 @@ class MainHandler(webapp2.RequestHandler):
         'logout_url': users.create_logout_url('/')
       }
       render_template(self, 'index.html', page_params)
-
 #"My Account" page handler for editing information
 class accountManageDisplay(webapp2.RequestHandler):
   def get(self):
