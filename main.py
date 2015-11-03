@@ -37,6 +37,9 @@ class MainHandler(webapp2.RequestHandler):
         fname = qry.firstName
         lname = qry.lastName
         username = qry.username
+      else:
+        user = accountModel(id=users.get_current_user().user_id(), firstName=fname, lastName=lname, username=email.split("@",1)[0], score=0)
+        accountModel.put(user)
     page_params = {
       'user_email': email,
       'firstName': fname,
@@ -272,8 +275,6 @@ class leaderboardHandler(webapp2.RequestHandler):
 
 
 ################## End Page Handlers ####################
-
-
 
 
 
