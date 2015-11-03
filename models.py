@@ -32,6 +32,7 @@ class challengeModel(ndb.Model):
   answer = ndb.TextProperty()
   attachments = ndb.BlobProperty
   score = ndb.IntegerProperty()
+  name = ndb.StringProperty()
 
 
 # Challenge Access table

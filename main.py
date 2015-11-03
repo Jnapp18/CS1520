@@ -169,6 +169,7 @@ class manageChallengeHandler(webapp2.RequestHandler):
     fname = ""
     lname = ""
     username = ""
+    results = challengeModel.query(challengeModel.ownerID == users.get_current_user().user_id())
     if email:
       qry = accountModel.get_by_id(users.get_current_user().user_id())
       if qry:
@@ -181,21 +182,10 @@ class manageChallengeHandler(webapp2.RequestHandler):
       'lastName': lname,
       'username': username,
       'login_url': users.create_login_url(),
-      'logout_url': users.create_logout_url('/')
+      'logout_url': users.create_logout_url('/'),
+      'challenges': results
     }
     render_template(self, 'manageChallenges.html', page_params)
-    if email:
-      qry2 = challengeModel.query(challengeModel.ownerID == users.get_current_user().user_id())
-      if qry2:
-        self.response.out.write(
-          '''<div><table class="challenge-table" align="center" style="margin: 0px auto;"><tr><th>Question</th><th>Answer</th><th>Points</th></tr>''')
-        for q in qry2:
-          self.response.out.write(
-            '''<tr><td data-th="Question">%s</td><td data-th="Answer">%s</td><td data-th="Points">%d</td></tr>''' % (
-              q.question, q.answer, q.score))
-        self.response.out.write('''</table>''')
-    else:
-      self.redirect('/')
 
 
 class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
@@ -231,6 +221,7 @@ class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
       Challenge.answer = self.request.get('answer')
       Challenge.attachments = uploaded_file
       Challenge.score = int(self.request.get('points'))
+      Challenge.name = self.request.get('name')
       Challenge.put()
       page_params = {
         'login_url': users.create_login_url(),
