@@ -3,6 +3,7 @@
   <title>PittCTF</title>
   <link rel="stylesheet" href="/stylesheets/bootstrap.css">
 </head>
+<meta name=viewport content="width=device-width, initial-scale=1">
 <body class="bkg">
 <div>
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
@@ -67,9 +68,6 @@
 
 
 <script>
-
-// we use this function so that we can abstract any support for older 
-// browsers into the details.
 function createXmlHttp() {
   var xmlhttp;
   if (window.XMLHttpRequest) {
@@ -83,8 +81,6 @@ function createXmlHttp() {
   return xmlhttp;
 }
 
-// use the given xmlHttp object to send the given parameters to the 
-// target URL.  parameters should be a URL formatted string.
 function postParameters(xmlHttp, target, parameters) {
   if (xmlHttp) {
     xmlHttp.open("POST",target,true);
