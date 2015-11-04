@@ -18,7 +18,7 @@
 from helperFunctions import *
 from models import *
 import webapp2
-from google.appengine.api import users
+from google.appengine.api import users, mail
 from google.appengine.ext.webapp import blobstore_handlers
 
 
@@ -38,8 +38,10 @@ class MainHandler(webapp2.RequestHandler):
         lname = qry.lastName
         username = qry.username
       else:
-        user = accountModel(id=users.get_current_user().user_id(), firstName=fname, lastName=lname, username=email.split("@",1)[0], score=0)
+        user = accountModel(id=users.get_current_user().user_id(), firstName=fname, lastName=lname,
+                            username=email.split("@", 1)[0], score=0)
         accountModel.put(user)
+        mail.send_mail('welcome@pittctf.appspotmail.com', email, 'Welcome to PITTCTF', 'Welcome. Good luck. Have fun. Etc.')
     page_params = {
       'user_email': email,
       'firstName': fname,
@@ -48,10 +50,9 @@ class MainHandler(webapp2.RequestHandler):
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/')
     }
-    render_template(self, 'index.html', page_params)
+    render_template(self, 'index.html', page_params)  # "My Account" page handler for editing information
 
 
-# "My Account" page handler for editing information
 class accountManageDisplay(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
