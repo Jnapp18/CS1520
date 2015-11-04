@@ -1,0 +1,65 @@
+{% extends "_base.html" %}
+{% block bodycontent %}
+<div id="correctModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <p>Correct!</p>
+      </div>
+      <div class="modal-body" id="myModalBody">
+        <div class="modal-body">
+          <p>You have earned {{ chalObject.score }} points!<p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="incorrectModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <p>Incorrect!</p>
+      </div>
+      <div class="modal-body" id="myModalBody">
+        <div class="modal-body">
+          <p>Try again.<p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-failure" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script language="JavaScript" type="text/javascript">
+function here()
+{
+	var userAnswer = $('input[name=answer]').val();
+	var actualAnswer = "{{chalObject.answer}}";
+	if( userAnswer == actualAnswer)
+		$('#correctModal').modal('show');
+	else
+		$('#incorrectModal').modal('show');
+		
+	return false;
+}
+//-->
+</script>
+<div class="contentbkg">
+    <form align="center" onSubmit="return here();">
+    	<h2 align="center">{{ chalObject.name }}</h2>
+		<p align="center">{{ chalObject.question }}</p>
+		<p align="center">Points for correct answer: {{ chalObject.score }}</p>
+    	Answer:<br>
+    	<input name="answer" type="text" required="true"><br><br>
+    	<input value="  Submit!  " type="submit">
+    </form>
+</div>
+{% endblock %}
+

@@ -198,6 +198,29 @@ class manageChallengeHandler(webapp2.RequestHandler):
     }
     render_template(self, 'manageChallenges.html', page_params)
 
+#Solve Challenge Handler
+class solveChallengeHandler(webapp2.RequestHandler):
+  def get(self):
+    email = get_user_email()
+    fname = ""
+    lname = ""
+    username = ""
+    if email:
+      chal_id = self.request.get('chal_id')
+      chalObject = challengeModel.query(challengeModel.name == str(chal_id)).get()
+    page_params = {
+      'user_email': email,
+      'firstName': fname,
+      'lastName': lname,
+      'username': username,
+      'chalObject': chalObject,
+      'login_url': users.create_login_url(),
+      'logout_url': users.create_logout_url('/')
+    }
+    render_template(self, 'solveChallenge.html', page_params)
+
+
+
 # UploadChallenge Handler
 class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
   def get(self):
@@ -297,6 +320,7 @@ mappings = [
   ('/Challenges', ChallengeHandler),
   ('/manageChallenges', manageChallengeHandler),
   ('/uploadChallenge', uploadChallengeHandler),
+  ('/solveChallenge', solveChallengeHandler),
   ('/acctManage', accountManagementHandler),
   ('/acctManageInfo', accountManageDisplay),
   ('/getxml', TestXml),

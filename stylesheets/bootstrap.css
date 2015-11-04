@@ -3440,6 +3440,10 @@ fieldset[disabled] .btn-primary.active {
   color: #fff;
   background-color: #5cb85c;
 }
+.btn-failure {
+  color: #fff;
+  background-color: #b31217;
+}
 .btn-success:focus,
 .btn-success.focus {
   color: #fff;

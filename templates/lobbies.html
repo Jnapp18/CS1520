@@ -11,7 +11,7 @@
       </tr>
       {% for chal in challenges %}
         <tr>
-          <td><a href="/{{ chal.name }}">{{ chal.name }}</a></td>
+          <td><a href="/solveChallenge?chal_id={{ chal.name }}">{{ chal.name }}</a></td>
           <td>{{ chal.question }}</td>
           <td>{{ chal.score }}</td>
         </tr>

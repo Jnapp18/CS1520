@@ -2,32 +2,11 @@ to-do
 
 Milestone 2
 
+
+custom urls to answer challenges
+
 -lobby needs to get developed
 	- For milestone 2 - simply get a list of the challenges, be able to click on them, open individual challenge in new page, and submit answer, add points to users score. Keep track of challenge if completed. jack - (2 hours)
-
-
-Jack/Sam
-	-Sanitize inputs - Jack (30 minutes) - import CGI, CGI.escape to prevent <br> type inputs
-
-
-- Challenge management  - print challenges in template rather than from main.py (40 mins)
-- Add users to DB when they log in -
-	set user name to email`
-
-- Contact us modal - mailto needs to be added  Adam ( 20-30 minutes)
-		Modal can be found at bottom of _base.html
-		just add simple contact us with outgoing email
-		use email jnapp18@gmail.com
-
-
--all existing features refined
-
-
-
-
-
-
-
 
 
 Milestone 3
