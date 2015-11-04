@@ -48,17 +48,71 @@
     </div>
   </div>
   {% block bodycontent %}{% endblock %}
+
+
+  <div id="texthere"></div>
+
   <div id="jack-footer" class="navbar navbar-default navbar-fixed-bottom" role="navigation">
     <div class="container-fluid">
       <div class="navbar-header"><a class="navbar-brand" href="/">PittCTF</a></div>
       <div class="collapse navbar-collapse navbar-menubuilder">
         <ul class="nav navbar-nav navbar-right">
           <li><a href="#" data-toggle="modal" data-target="#contact">Contact Us</a></li>
+          <li><a href="#" onclick="testxml();">Try Me!</a></li>
         </ul>
       </div>
     </div>
   </div>
 </div>
+
+
+<script>
+
+// we use this function so that we can abstract any support for older 
+// browsers into the details.
+function createXmlHttp() {
+  var xmlhttp;
+  if (window.XMLHttpRequest) {
+    xmlhttp = new XMLHttpRequest();
+  } else {
+    xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+  }
+  if (!(xmlhttp)) {
+    alert("Your browser does not support AJAX!");
+  }
+  return xmlhttp;
+}
+
+// use the given xmlHttp object to send the given parameters to the 
+// target URL.  parameters should be a URL formatted string.
+function postParameters(xmlHttp, target, parameters) {
+  if (xmlHttp) {
+    xmlHttp.open("POST",target,true);
+    xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xmlHttp.send(parameters);
+   }
+}
+function testxml() {
+  var xmlHttp = createXmlHttp();
+  xmlHttp.onreadystatechange=function() {
+    if(xmlHttp.readyState == 4) {
+      var xml = xmlHttp.responseXML;
+      var users = xml.getElementsByTagName('user');
+      var text = '';
+      for (var i = 0; i < users.length; i++) {
+        var firstName = users[i].getElementsByTagName('first_name')[0].textContent;
+        var lastName = users[i].getElementsByTagName('last_name')[0].textContent;
+        text += firstName + " " + lastName + "<br>";
+      }
+      text = "<div class=\"contentbkg\"><p>" + text + "</p></div>";
+      var d = document.getElementById('texthere');
+      d.innerHTML = text;
+    }
+  }
+  postParameters(xmlHttp, '/getxml', '');
+}
+
+</script>
 <!-- Trigger the modal with a button -->
 <!-- Modal -->
 <div id="contact" class="modal fade" role="dialog">

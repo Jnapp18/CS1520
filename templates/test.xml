@@ -1,0 +1,14 @@
+<users>
+    <user>
+        <first_name>This is ajax</first_name>
+        <last_name></last_name>
+    </user>
+    <user>
+        <first_name>We don't need it right now</first_name>
+        <last_name></last_name>
+    </user>
+    <user>
+        <first_name>We will make better use of it later</first_name>
+        <last_name></last_name>
+    </user>
+</users>

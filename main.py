@@ -274,7 +274,14 @@ class leaderboardHandler(webapp2.RequestHandler):
       'rank': rank
     }
     render_template(self, 'leaderboard.html', page_params)
-
+# useless ajax
+class TestXml(webapp2.RequestHandler) :
+  def get(self) :
+    self.post()
+  
+  def post(self) :
+    self.response.headers['Content-Type'] = 'text/xml'
+    render_template(self, 'test.xml', {})
 
 ################## End Page Handlers ####################
 
@@ -292,6 +299,7 @@ mappings = [
   ('/uploadChallenge', uploadChallengeHandler),
   ('/acctManage', accountManagementHandler),
   ('/acctManageInfo', accountManageDisplay),
+  ('/getxml', TestXml),
   ('/leaderboard', leaderboardHandler)
 ]
 app = webapp2.WSGIApplication(mappings, debug=True)
