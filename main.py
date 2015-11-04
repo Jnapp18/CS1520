@@ -56,7 +56,7 @@ class EmailHandler(webapp2.RequestHandler):
     if email:
       subject = self.request.get('subject')
       body = self.request.get('body')
-      mail.send_mail('jnapp18@gmail.com', email, subject, body)
+      mail.send_mail(email, 'jnapp18@gmail.com', subject, body)
       self.redirect('/')
     self.redirect('/')
 
@@ -130,6 +130,7 @@ class LobbyHandler(webapp2.RequestHandler):
     fname = ""
     lname = ""
     username = ""
+    results = challengeModel.query()
     if email:
       qry = accountModel.get_by_id(users.get_current_user().user_id())
       if qry:
@@ -142,10 +143,12 @@ class LobbyHandler(webapp2.RequestHandler):
       'lastName': lname,
       'username': username,
       'login_url': users.create_login_url(),
-      'logout_url': users.create_logout_url('/')
+      'logout_url': users.create_logout_url('/'),
+      'challenges': results
     }
     render_template(self, 'lobbies.html', page_params)
 
+# Challenge Handler
 class ChallengeHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
@@ -168,6 +171,7 @@ class ChallengeHandler(webapp2.RequestHandler):
     }
     render_template(self, 'challenges.html', page_params)
 
+# manageChallenge Handler
 class manageChallengeHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
@@ -175,6 +179,7 @@ class manageChallengeHandler(webapp2.RequestHandler):
     lname = ""
     username = ""
     results = challengeModel.query(challengeModel.ownerID == users.get_current_user().user_id())
+    publicResults = challengeModel.query()
     if email:
       qry = accountModel.get_by_id(users.get_current_user().user_id())
       if qry:
@@ -188,10 +193,12 @@ class manageChallengeHandler(webapp2.RequestHandler):
       'username': username,
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/'),
-      'challenges': results
+      'challenges': results,
+      'pChallenges': publicResults
     }
     render_template(self, 'manageChallenges.html', page_params)
 
+# UploadChallenge Handler
 class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
   def get(self):
     email = get_user_email()
@@ -239,6 +246,7 @@ class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
     else:
       self.redirect('/')
 
+# Leaderboard Handler
 class leaderboardHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()

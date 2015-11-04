@@ -98,7 +98,9 @@ a {
   min-width: 300px;
   border-collapse: collapse;
 }
-
+.challenge-table a, .challenge-table a:hover, .challenge-table a:visited, a:active {
+    color: #ffd464;   
+}
 /* line 68, style.sass */
 table {
   align: center;
