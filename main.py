@@ -37,11 +37,11 @@ class MainHandler(webapp2.RequestHandler):
         fname = qry.firstName
         lname = qry.lastName
         username = qry.username
-      else:
-        user = accountModel(id=users.get_current_user().user_id(), firstName=fname, lastName=lname,
-                            username=email.split("@", 1)[0], score=0)
+      else:  # THIS IS WHERE I DID WORK. IF FIRST TIME USER, ADD THEM TO THE NDB, SEND THEM AN EMAIL -sk
+        user = accountModel(id=users.get_current_user().user_id(), firstName=fname, lastName=lname, username=email.split("@", 1)[0], score=0)
         accountModel.put(user)
-        mail.send_mail('welcome@pittctf.appspotmail.com', email, 'Welcome to PITTCTF', 'Welcome. Good luck. Have fun. Etc.')
+        mail.send_mail('welcome@pittctf.appspotmail.com', email, 'Welcome to PITTCTF',
+                       'Welcome. Good luck. Have fun. Etc.')
     page_params = {
       'user_email': email,
       'firstName': fname,
@@ -50,9 +50,10 @@ class MainHandler(webapp2.RequestHandler):
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/')
     }
-    render_template(self, 'index.html', page_params)  # "My Account" page handler for editing information
+    render_template(self, 'index.html', page_params)
 
 
+# "My Account" page handler for editing information
 class accountManageDisplay(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
