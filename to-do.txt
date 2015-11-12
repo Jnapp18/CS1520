@@ -1,17 +1,20 @@
-to-do
-
-Milestone 2
-
-
-custom urls to answer challenges
-
--lobby needs to get developed
-	- For milestone 2 - simply get a list of the challenges, be able to click on them, open individual challenge in new page, and submit answer, add points to users score. Keep track of challenge if completed. jack - (2 hours)
-
-
 Milestone 3
 - flagging system to prevent inappropriate uploads
+
 - public/private lobbies if not implemented
 
+- lobby needs to get developed
 
---my challenges tab
+- point tracking, keeping track of score
+
+- public leaderboard only reflects admin
+
+- my challenges tab
+
+- How should we format ndb models so that users have access to lobbies, can create lobbies, blah blah blah
+
+- need to actually get zip downloads working
+
+- leaderboard on per lobby basis
+
+- answers need to be pulled through ajax, not stored in the web page
