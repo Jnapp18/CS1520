@@ -43,7 +43,7 @@ class challengeAccessModel(ndb.Model):
 
 # progress tracking table
 class progressTable(ndb.Model):
-  userID = ndb.IntegerProperty()
+  userID = ndb.StringProperty()
   lobbyID = ndb.IntegerProperty()
-  challengeID = ndb.IntegerProperty()
+  challengeID = ndb.StringProperty()
   ################## End NDB Models ####################

@@ -18,6 +18,7 @@
 from helperFunctions import *
 from models import *
 import webapp2
+import random
 from google.appengine.api import users, mail
 from google.appengine.ext.webapp import blobstore_handlers
 
@@ -202,24 +203,48 @@ class manageChallengeHandler(webapp2.RequestHandler):
 class solveChallengeHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
-    fname = ""
-    lname = ""
-    username = ""
+    chal_id = self.request.get('chal_id')
+    user_id = users.get_current_user().user_id()
+    solved = 0 #not yet solved
     if email:
-      chal_id = self.request.get('chal_id')
       chalObject = challengeModel.query(challengeModel.name == str(chal_id)).get()
+      progTable = progressTable.query(progressTable.userID == user_id, progressTable.challengeID == chal_id).get()
+      if progTable:
+        #if query exists where userID and ChallengeID already exist, then we know they have solved this one
+        solved = 1
+      else:
+        solved = 0
     page_params = {
+      'solved': solved,
       'user_email': email,
-      'firstName': fname,
-      'lastName': lname,
-      'username': username,
       'chalObject': chalObject,
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/')
     }
     render_template(self, 'solveChallenge.html', page_params)
-
-
+  def post(self):
+    email = get_user_email()
+    chal_id = self.request.get('chal_id')
+    userAnswer = self.request.get('userAnswer')
+    user_id = users.get_current_user().user_id()
+    if email:
+      chalObject = challengeModel.query(challengeModel.name == str(chal_id)).get()
+      if userAnswer == chalObject.answer:
+        self.response.out.write('Correct')
+        progTable = progressTable.query(progressTable.userID == user_id, progressTable.challengeID == chal_id).get()
+        if progTable:
+          print "should not be in here"
+        else:
+          progTableUpdate = progressTable()
+          progTableUpdate.userID = user_id
+          progTableUpdate.lobbyID = 1
+          progTableUpdate.challengeID = chal_id
+          progTableUpdate.put()
+      else:
+        self.response.out.write('Incorrect')
+      
+    else:
+      self.redirect('/')
 
 # UploadChallenge Handler
 class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
@@ -249,7 +274,7 @@ class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
       # updating the database with challenge information
       uploaded_file = self.get_uploads()
       Challenge = challengeModel()
-      Challenge.challengeID = 1
+      Challenge.challengeID = random.randint(1, 1000)
       Challenge.ownerID = users.get_current_user().user_id()
       Challenge.question = self.request.get('question')
       Challenge.answer = self.request.get('answer')
@@ -297,15 +322,6 @@ class leaderboardHandler(webapp2.RequestHandler):
       'rank': rank
     }
     render_template(self, 'leaderboard.html', page_params)
-# useless ajax
-class TestXml(webapp2.RequestHandler) :
-  def get(self) :
-    self.post()
-  
-  def post(self) :
-    self.response.headers['Content-Type'] = 'text/xml'
-    render_template(self, 'test.xml', {})
-
 ################## End Page Handlers ####################
 
 
@@ -323,7 +339,6 @@ mappings = [
   ('/solveChallenge', solveChallengeHandler),
   ('/acctManage', accountManagementHandler),
   ('/acctManageInfo', accountManageDisplay),
-  ('/getxml', TestXml),
   ('/leaderboard', leaderboardHandler)
 ]
 app = webapp2.WSGIApplication(mappings, debug=True)

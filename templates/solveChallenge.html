@@ -1,5 +1,25 @@
 {% extends "_base.html" %}
 {% block bodycontent %}
+<div id="question" class="contentbkg">
+    {% if solved == 1 %}
+    <h2 align="center">{{ chalObject.name }}</h2>
+    <p align="center">{{ chalObject.question }}</p>
+    <p align="center">Points for correct answer: {{ chalObject.score }}</p>
+    <p align="center">You have already solved this question!</p>
+    {% else %}
+    <form align="center" onSubmit="return here()">
+        <h2 align="center">{{ chalObject.name }}</h2>
+        <p align="center">{{ chalObject.question }}</p>
+        <p align="center">Points for correct answer: {{ chalObject.score }}</p>
+        <div id="answered">
+            Answer:<br>
+            <input type="text" name="answer" required="true"><br><br>
+            <input type="submit" value="Submit">
+        </div>
+    </form>
+    {% endif %}
+</div>
+<!-- MODALS -->
 <div id="correctModal" class="modal fade" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -37,29 +57,65 @@
   </div>
 </div>
 
-<script language="JavaScript" type="text/javascript">
-function here()
+
+<script>
+function here() 
 {
-	var userAnswer = $('input[name=answer]').val();
-	var actualAnswer = "{{chalObject.answer}}";
-	if( userAnswer == actualAnswer)
-		$('#correctModal').modal('show');
-	else
-		$('#incorrectModal').modal('show');
-		
-	return false;
+    var userAnswer = $('input[name=answer]').val();
+    var xmlHttp = createXmlHttp();
+    var chalID = "{{ chalObject.name }}";
+    xmlHttp.onreadystatechange=function() 
+    {
+        if(xmlHttp.readyState == 4) 
+        {
+            if (xmlHttp.status == 200)
+            {
+                var data = xmlHttp.responseText;
+                var d = document.getElementById('answered');
+                if(data == "Correct")
+                {
+                    d.innerHTML = "<p>Correct!</p>";
+                    $('#correctModal').modal('show');
+                }
+                else
+                    $('#incorrectModal').modal('show');
+            }
+            else if (xmlHttp.status == 404)
+                alert("Request URL does not exist");
+            else
+                alert("Error: status code is " + xmlHttp.status);
+        }
+    }
+    postParameters(xmlHttp, '/solveChallenge?userAnswer='+userAnswer+'&chal_id='+chalID);
+
+    return false;
 }
-//-->
+function createXmlHttp()
+{
+    var xmlhttp;
+    if (window.XMLHttpRequest)
+    {
+        xmlhttp = new XMLHttpRequest();
+    }
+    else
+    {
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    if (!(xmlhttp))
+    {
+        alert("Your browser does not support AJAX!");
+    }
+    return xmlhttp;
+}
+function postParameters(xmlHttp, target) 
+{
+    if (xmlHttp)
+    {
+        xmlHttp.open("POST",target,true);
+        xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+        xmlHttp.send();
+    }
+}
 </script>
-<div class="contentbkg">
-    <form align="center" onSubmit="return here();">
-    	<h2 align="center">{{ chalObject.name }}</h2>
-		<p align="center">{{ chalObject.question }}</p>
-		<p align="center">Points for correct answer: {{ chalObject.score }}</p>
-    	Answer:<br>
-    	<input name="answer" type="text" required="true"><br><br>
-    	<input value="  Submit!  " type="submit">
-    </form>
-</div>
 {% endblock %}
 
