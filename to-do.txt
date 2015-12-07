@@ -18,13 +18,12 @@ TODO - High to low importance
 DONT WORRY ABOUT THIS NOW
 --------------------------
 - How should we format ndb models so that users have access to lobbies, can create lobbies, blah blah blah
+- public leaderboard only reflects admin uploaded challenges
 
 
 JACK IS WORKING ON
 ---------------------
-- point tracking, keeping track of score
-
-- public leaderboard only reflects admin uploaded challenges
+- not sure yet
 
 
 
@@ -32,3 +31,5 @@ JACK IS WORKING ON
 DONE
 -----------------------
 - answers need to be pulled through ajax, not stored in the web page
+- point tracking, keeping track of score
+

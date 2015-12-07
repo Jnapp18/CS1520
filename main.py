@@ -107,10 +107,12 @@ class accountManagementHandler(webapp2.RequestHandler):
       lname = self.request.get('lname')
       username = self.request.get('username')
       # updating the database with account information
+      AccountQry = accountModel.get_by_id(users.get_current_user().user_id())
       AcctModel = accountModel(id=users.get_current_user().user_id())
       AcctModel.firstName = fname
       AcctModel.lastName = lname
       AcctModel.username = username
+      AcctModel.score = AccountQry.score
       AcctModel.put()
       page_params = {
         'login_url': users.create_login_url(),
@@ -229,12 +231,22 @@ class solveChallengeHandler(webapp2.RequestHandler):
     user_id = users.get_current_user().user_id()
     if email:
       chalObject = challengeModel.query(challengeModel.name == str(chal_id)).get()
+      chalScore = chalObject.score
       if userAnswer == chalObject.answer:
         self.response.out.write('Correct')
         progTable = progressTable.query(progressTable.userID == user_id, progressTable.challengeID == chal_id).get()
         if progTable:
-          print "should not be in here"
+          print "should not be in here"#because you not be able to get to this method if the question is already
+                                      # answered you cannot submit again. If a user is sneaky with the url
+                                      #This will prevent the user from gaining points
         else:
+          AccountQry = accountModel.get_by_id(users.get_current_user().user_id())
+          AcctModel = accountModel(id=users.get_current_user().user_id())
+          AcctModel.score = AccountQry.score + chalScore
+          AcctModel.firstName = AccountQry.firstName
+          AcctModel.lastName = AccountQry.lastName
+          AcctModel.username = AccountQry.username
+          AcctModel.put()
           progTableUpdate = progressTable()
           progTableUpdate.userID = user_id
           progTableUpdate.lobbyID = 1
