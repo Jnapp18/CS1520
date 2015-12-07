@@ -1,20 +1,34 @@
 Milestone 3
-- flagging system to prevent inappropriate uploads
-
-- public/private lobbies if not implemented
-
-- lobby needs to get developed
-
-- point tracking, keeping track of score
-
-- public leaderboard only reflects admin
-
-- my challenges tab
-
-- How should we format ndb models so that users have access to lobbies, can create lobbies, blah blah blah
+---------------
+TODO - High to low importance
+------------------------------
+- lobbies needs to get developed
 
 - need to actually get zip downloads working
 
+- my challenges tab
+
 - leaderboard on per lobby basis
 
+- flagging system to prevent inappropriate uploads
+
+
+
+
+DONT WORRY ABOUT THIS NOW
+--------------------------
+- How should we format ndb models so that users have access to lobbies, can create lobbies, blah blah blah
+
+
+JACK IS WORKING ON
+---------------------
+- point tracking, keeping track of score
+
+- public leaderboard only reflects admin uploaded challenges
+
+
+
+
+DONE
+-----------------------
 - answers need to be pulled through ajax, not stored in the web page
