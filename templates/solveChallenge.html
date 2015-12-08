@@ -2,20 +2,20 @@
 {% block bodycontent %}
 <div id="question" class="contentbkg">
     {% if solved == 1 %}
-    <h2 align="center">{{ chalObject.name }}</h2>
-    <p align="center">{{ chalObject.question }}</p>
-    <p align="center">Points for correct answer: {{ chalObject.score }}</p>
-    <p align="center">You have already solved this question!</p>
+    <p class="chaltitle" align="center"><u>{{ chalObject.name }}</u></h2>
+    <p class="chalquestion" align="center">{{ chalObject.question }}</p>
+    <p class="chalquestion" align="center">You have already solved this question!</p>
+    <p class="chalanswer" align="center">You earned {{ chalObject.score }} points from this question!</p>
     {% else %}
     <form align="center" onSubmit="return here()">
-        <h2 align="center">{{ chalObject.name }}</h2>
-        <p align="center">{{ chalObject.question }}</p>
-        <p align="center">Points for correct answer: {{ chalObject.score }}</p>
+        <p class="chaltitle" align="center"><u>{{ chalObject.name }}</u></h2>
+        <p class="chalquestion" align="center">{{ chalObject.question }}</p>
         <div id="answered">
             Answer:<br>
             <input type="text" name="answer" required="true"><br><br>
             <input type="submit" value="Submit">
         </div>
+        <br><br><p class="chalanswer" align="center">Points for correct answer: {{ chalObject.score }}</p>
     </form>
     {% endif %}
 </div>
@@ -74,7 +74,7 @@ function here()
                 var d = document.getElementById('answered');
                 if(data == "Correct")
                 {
-                    d.innerHTML = "<p>Correct!</p>";
+                    d.innerHTML = "<br><p>Correct!</p>";
                     $('#correctModal').modal('show');
                 }
                 else

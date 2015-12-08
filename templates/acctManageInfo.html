@@ -2,10 +2,14 @@
 {% block bodycontent %}
 <div class="contentbkg">
 	<h2 align="center">Manage Account</h2>
-	<p id="acct"><b>Email Address:</b> <i>{{ user_email}}</i></p>
-	<p id="acct"><b>First Name:</b> <i>{{ firstName }}</i></p>
-	<p id="acct"><b>Last Name:</b> <i>{{ lastName }}</i></p>
-	<p id="acct"><b>Username:</b> <i>{{ username }}</i></p>
-	<li><a href="/acctManage">Edit Account</a></li>
+	<div class="actmng">
+		<ul class="list-group">
+		  <li class="list-group-item"><b>Email Address:</b> <i>{{ user_email}}</i></li>
+		  <li class="list-group-item"><b>First Name:</b> <i>{{ firstName }}</i></li>
+		  <li class="list-group-item"><b>Last Name:</b> <i>{{ lastName }}</i></li>
+		  <li class="list-group-item"><b>Username:</b> <i>{{ username }}</i></li>
+		</ul>
+	</div>
+	<p class="chalanswer"><a href="/acctManage">Edit Account</a></p>
 </div>
 {% endblock %}

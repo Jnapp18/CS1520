@@ -16,9 +16,45 @@
   padding-left: 30px;
   padding-right: 30px;
   margin-top: 70px;
+  margin-left: 40px;
+  margin-right: 40px;
   padding-top: 5px;
   padding-bottom: 10px;
   background: rgba(240, 241, 238, 0.85);
+}
+.chalquestion
+{
+  font: 25px Roboto, Helvetica, sans-serif;
+  margin-right: 20%;
+  margin-left: 20%;
+  color: #333332;
+}
+.actmng
+{
+  margin: 0 auto;
+  max-width: 600px;
+}
+.spacing
+{
+  padding-left: 30px;
+  padding-right: 30px;
+  padding-top: 5px;
+  padding-bottom: 10px;
+  margin-top: 70px;
+}
+.chaltitle
+{
+  font: 40px Roboto, Helvetica, sans-serif;
+  margin-right: 20%;
+  margin-left: 20%;
+  color: #333332;
+}
+.chalanswer
+{
+  font: 25px Roboto, Helvetica, sans-serif;
+  margin-right: 20%;
+  margin-left: 20%;
+  color: #1352a2;
 }
 
 /* line 13, style.sass */

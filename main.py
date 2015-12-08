@@ -205,10 +205,18 @@ class manageChallengeHandler(webapp2.RequestHandler):
 class solveChallengeHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
+    fname = ""
+    lname = ""
+    username = ""
     chal_id = self.request.get('chal_id')
     user_id = users.get_current_user().user_id()
     solved = 0 #not yet solved
     if email:
+      qry = accountModel.get_by_id(users.get_current_user().user_id())
+      if qry:
+        fname = qry.firstName
+        lname = qry.lastName
+        username = qry.username
       chalObject = challengeModel.query(challengeModel.name == str(chal_id)).get()
       progTable = progressTable.query(progressTable.userID == user_id, progressTable.challengeID == chal_id).get()
       if progTable:
@@ -219,6 +227,9 @@ class solveChallengeHandler(webapp2.RequestHandler):
     page_params = {
       'solved': solved,
       'user_email': email,
+      'firstName': fname,
+      'lastName': lname,
+      'username': username,
       'chalObject': chalObject,
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/')
@@ -262,9 +273,20 @@ class solveChallengeHandler(webapp2.RequestHandler):
 class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
   def get(self):
     email = get_user_email()
+    fname = ""
+    lname = ""
+    username = ""
     if email:
+      qry = accountModel.get_by_id(users.get_current_user().user_id())
+      if qry:
+        fname = qry.firstName
+        lname = qry.lastName
+        username = qry.username
       page_params = {
         'user_email': email,
+        'firstName': fname,
+        'lastName': lname,
+        'username': username,
         'login_url': users.create_login_url(),
         'logout_url': users.create_logout_url('/')
       }
