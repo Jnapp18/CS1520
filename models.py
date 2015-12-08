@@ -42,12 +42,3 @@ class progressTable(ndb.Model):
   lobbyID = ndb.IntegerProperty()
   challengeID = ndb.StringProperty()
   ################## End NDB Models ####################
-
-
-
-
-
-class UserPhoto(ndb.Model):
-  user = ndb.StringProperty()
-  blob_key = ndb.BlobKeyProperty()
-
