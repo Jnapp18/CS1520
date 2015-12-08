@@ -15,15 +15,17 @@
 # limitations under the License.
 #
 
+import logging
+import re
+import time
+
+import webapp2
+from google.appengine.api import mail, users
+from google.appengine.ext import blobstore, ndb
+from google.appengine.ext.webapp import blobstore_handlers
+
 from helperFunctions import *
 from models import *
-import webapp2
-import random
-import logging
-import time
-import re
-from google.appengine.api import users, mail
-from google.appengine.ext.webapp import blobstore_handlers
 
 
 ################## Page Handlers ####################
@@ -42,7 +44,8 @@ class MainHandler(webapp2.RequestHandler):
         lname = qry.lastName
         username = qry.username
       else:  # THIS IS WHERE I DID WORK. IF FIRST TIME USER, ADD THEM TO THE NDB, SEND THEM AN EMAIL -sk
-        user = accountModel(id=users.get_current_user().user_id(), firstName=fname, lastName=lname, username=email.split("@", 1)[0], score=0)
+        user = accountModel(id=users.get_current_user().user_id(), firstName=fname, lastName=lname,
+                            username=email.split("@", 1)[0], score=0)
         accountModel.put(user)
     page_params = {
       'user_email': email,
@@ -54,6 +57,7 @@ class MainHandler(webapp2.RequestHandler):
     }
     render_template(self, 'index.html', page_params)
 
+
 # Email handler.
 class EmailHandler(webapp2.RequestHandler):
   def post(self):
@@ -64,6 +68,7 @@ class EmailHandler(webapp2.RequestHandler):
       mail.send_mail(email, 'jnapp18@gmail.com', subject, body)
       self.redirect('/')
     self.redirect('/')
+
 
 # "My Account" page handler for editing information
 class accountManageDisplay(webapp2.RequestHandler):
@@ -87,6 +92,7 @@ class accountManageDisplay(webapp2.RequestHandler):
       'logout_url': users.create_logout_url('/')
     }
     render_template(self, 'acctManageInfo.html', page_params)
+
 
 # Handler for "My Account" information. Displays information and updates ndb accountModel with new info.
 class accountManagementHandler(webapp2.RequestHandler):
@@ -140,6 +146,7 @@ class accountManagementHandler(webapp2.RequestHandler):
     else:
       self.redirect('/')
 
+
 # Lobby Handler
 class LobbyHandler(webapp2.RequestHandler):
   def get(self):
@@ -165,7 +172,8 @@ class LobbyHandler(webapp2.RequestHandler):
     }
     render_template(self, 'lobbies.html', page_params)
 
-#Create Lobby Handler
+
+# Create Lobby Handler
 class createLobbyHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
@@ -174,7 +182,7 @@ class createLobbyHandler(webapp2.RequestHandler):
     username = ""
     results = challengeModel.query(challengeModel.ownerID == users.get_current_user().user_id())
     resultSize = 0
-    if(results.count()>0):
+    if (results.count() > 0):
       resultSize = 1
     if email:
       qry = accountModel.get_by_id(users.get_current_user().user_id())
@@ -193,6 +201,7 @@ class createLobbyHandler(webapp2.RequestHandler):
       'numchallenges': resultSize
     }
     render_template(self, 'createLobby.html', page_params)
+
   def post(self):
     email = get_user_email()
     fname = ""
@@ -235,7 +244,8 @@ class createLobbyHandler(webapp2.RequestHandler):
     else:
       self.redirect('/')
 
-#Manage Lobby Handler
+
+# Manage Lobby Handler
 class manageLobbyHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
@@ -244,7 +254,7 @@ class manageLobbyHandler(webapp2.RequestHandler):
     username = ""
     results = lobbyModel.query(lobbyModel.ownerID == users.get_current_user().user_id())
     resultSize = 0
-    if(results.count()>0):
+    if (results.count() > 0):
       resultSize = 1
     if email:
       qry = accountModel.get_by_id(users.get_current_user().user_id())
@@ -264,7 +274,8 @@ class manageLobbyHandler(webapp2.RequestHandler):
     }
     render_template(self, 'manageLobbies.html', page_params)
 
-#enterLobby
+
+# enterLobby
 class enterLobbyHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
@@ -286,18 +297,18 @@ class enterLobbyHandler(webapp2.RequestHandler):
       if pubLobQry:
         lobbyName = pubLobQry.lobbyName
         results = challengeModel.query(challengeModel.ownerID == "120023531168187223130")
-        if(results.count()>0):
+        if (results.count() > 0):
           resultSize = 1
       page_params = {
-      'user_email': email,
-      'firstName': fname,
-      'lastName': lname,
-      'username': username,
-      'lobbyName': lobbyName,
-      'challenges': results,
-      'numchallenges': resultSize,
-      'login_url': users.create_login_url(),
-      'logout_url': users.create_logout_url('/')
+        'user_email': email,
+        'firstName': fname,
+        'lastName': lname,
+        'username': username,
+        'lobbyName': lobbyName,
+        'challenges': results,
+        'numchallenges': resultSize,
+        'login_url': users.create_login_url(),
+        'logout_url': users.create_logout_url('/')
       }
       render_template(self, 'lobby.html', page_params)
     else:
@@ -317,27 +328,28 @@ class enterLobbyHandler(webapp2.RequestHandler):
         chalList = []
         i = 0
         for l in lobbyChalList:
-          chalList.insert(i,l.challengeID)
+          chalList.insert(i, l.challengeID)
           i = i + 1
         results = challengeModel.query(challengeModel.key.IN(chalList))
-        if(results.count()>0):
+        if (results.count() > 0):
           resultSize = 1
 
-
       page_params = {
-      'user_email': email,
-      'firstName': fname,
-      'lastName': lname,
-      'username': username,
-      'lobbyName': lobbyName,
-      'challenges': results,
-      'numchallenges': resultSize,
-      'login_url': users.create_login_url(),
-      'logout_url': users.create_logout_url('/')
+        'user_email': email,
+        'firstName': fname,
+        'lastName': lname,
+        'username': username,
+        'lobbyName': lobbyName,
+        'challenges': results,
+        'numchallenges': resultSize,
+        'login_url': users.create_login_url(),
+        'logout_url': users.create_logout_url('/')
       }
-      render_template(self, 'lobby.html', page_params)    
+      render_template(self, 'lobby.html', page_params)
 
-# manageChallenge Handler
+    # manageChallenge Handler
+
+
 class manageChallengeHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
@@ -346,7 +358,7 @@ class manageChallengeHandler(webapp2.RequestHandler):
     username = ""
     results = challengeModel.query(challengeModel.ownerID == users.get_current_user().user_id())
     resultSize = 0
-    if(results.count()>0):
+    if (results.count() > 0):
       resultSize = 1
     publicResults = challengeModel.query()
     if email:
@@ -368,7 +380,8 @@ class manageChallengeHandler(webapp2.RequestHandler):
     }
     render_template(self, 'manageChallenges.html', page_params)
 
-#Solve Challenge Handler
+
+# Solve Challenge Handler
 class solveChallengeHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
@@ -377,7 +390,7 @@ class solveChallengeHandler(webapp2.RequestHandler):
     username = ""
     chal_id = self.request.get('chal_id')
     user_id = users.get_current_user().user_id()
-    solved = 0 #not yet solved
+    solved = 0  # not yet solved
     if email:
       qry = accountModel.get_by_id(users.get_current_user().user_id())
       if qry:
@@ -387,7 +400,7 @@ class solveChallengeHandler(webapp2.RequestHandler):
       chalObject = challengeModel.query(challengeModel.name == str(chal_id)).get()
       progTable = progressTable.query(progressTable.userID == user_id, progressTable.challengeID == chal_id).get()
       if progTable:
-        #if query exists where userID and ChallengeID already exist, then we know they have solved this one
+        # if query exists where userID and ChallengeID already exist, then we know they have solved this one
         solved = 1
       else:
         solved = 0
@@ -402,6 +415,7 @@ class solveChallengeHandler(webapp2.RequestHandler):
       'logout_url': users.create_logout_url('/')
     }
     render_template(self, 'solveChallenge.html', page_params)
+
   def post(self):
     email = get_user_email()
     chal_id = self.request.get('chal_id')
@@ -414,9 +428,9 @@ class solveChallengeHandler(webapp2.RequestHandler):
         self.response.out.write('Correct')
         progTable = progressTable.query(progressTable.userID == user_id, progressTable.challengeID == chal_id).get()
         if progTable:
-          print "should not be in here"#because you not be able to get to this method if the question is already
-                                      # answered you cannot submit again. If a user is sneaky with the url
-                                      #This will prevent the user from gaining points
+          print "should not be in here"  # because you not be able to get to this method if the question is already
+          # answered you cannot submit again. If a user is sneaky with the url
+          # This will prevent the user from gaining points
         else:
           AccountQry = accountModel.get_by_id(users.get_current_user().user_id())
           AcctModel = accountModel(id=users.get_current_user().user_id())
@@ -432,9 +446,10 @@ class solveChallengeHandler(webapp2.RequestHandler):
           progTableUpdate.put()
       else:
         self.response.out.write('Incorrect')
-      
+
     else:
       self.redirect('/')
+
 
 # UploadChallenge Handler
 class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
@@ -460,6 +475,7 @@ class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
       render_template(self, 'uploadChallenge.html', page_params)
     else:
       self.redirect('/')
+
   def post(self):
     email = get_user_email()
     fname = ""
@@ -494,7 +510,8 @@ class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
     else:
       self.redirect('/')
 
-#Edit Challenge
+
+# Edit Challenge
 class editChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
   def get(self):
     email = get_user_email()
@@ -512,31 +529,30 @@ class editChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
         fname = userQry.firstName
         lname = userQry.lastName
         username = userQry.username
-    
+
     if challengeId:
       challenge = ndb.Key(urlsafe=challengeId).get()
-      #qry = challengeModel.query(challengeModel.key == ndb.Key(challengeModel, challengeNum))
-      #if challenge:
+      # qry = challengeModel.query(challengeModel.key == ndb.Key(challengeModel, challengeNum))
+      # if challenge:
       challengeName = challenge.name
       challengeQuestion = challenge.question
       challengeAnswer = challenge.answer
       challengePoints = challenge.score
-      
-    
+
     page_params = {
-    'user_email': email,
-    'firstName': fname,
-    'lastName': lname,
-    'username': username,
-    'challengeName': challengeName,
-    'challengeQuestion': challengeQuestion,
-    'challengeAnswer': challengeAnswer,
-    'challengePoints': challengePoints,
-    'login_url': users.create_login_url(),
-    'logout_url': users.create_logout_url('/')
+      'user_email': email,
+      'firstName': fname,
+      'lastName': lname,
+      'username': username,
+      'challengeName': challengeName,
+      'challengeQuestion': challengeQuestion,
+      'challengeAnswer': challengeAnswer,
+      'challengePoints': challengePoints,
+      'login_url': users.create_login_url(),
+      'logout_url': users.create_logout_url('/')
     }
     render_template(self, 'editChallenge.html', page_params)
-    
+
   def post(self):
     email = get_user_email()
     fname = ""
@@ -560,17 +576,19 @@ class editChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
         Challenge.name = self.request.get('name')
         Challenge.put()
         page_params = {
-        'login_url': users.create_login_url(),
-        'logout_url': users.create_logout_url('/'),
-        'user_email': email,
-        'firstName': fname,
-        'lastName': lname,
-        'username': username
+          'login_url': users.create_login_url(),
+          'logout_url': users.create_logout_url('/'),
+          'user_email': email,
+          'firstName': fname,
+          'lastName': lname,
+          'username': username
         }
-        time.sleep(0.2)  #There is a sleep timer here because the change will not appear when you redirect to manageChallenges.html unless you wait for 0.2 milliseconds
+        time.sleep(
+          0.2)  # There is a sleep timer here because the change will not appear when you redirect to manageChallenges.html unless you wait for 0.2 milliseconds
         self.redirect('/manageChallenges')
     else:
       self.redirect('/manageChallenges')
+
 
 # Leaderboard Handler
 class leaderboardHandler(webapp2.RequestHandler):
@@ -602,8 +620,132 @@ class leaderboardHandler(webapp2.RequestHandler):
     render_template(self, 'leaderboard.html', page_params)
 
 
-
 ################## End Page Handlers ####################
+
+########################################################################################################################
+#############################################START SAM TESTING##########################################################
+########################################################################################################################
+
+class FileUploadFormHandler(webapp2.RequestHandler):
+  def get(self):
+    email = get_user_email()
+    fname = ""
+    lname = ""
+    username = ""
+    if email:
+      qry = accountModel.get_by_id(users.get_current_user().user_id())
+      if qry:
+        fname = qry.firstName
+        lname = qry.lastName
+        username = qry.username
+      page_params = {
+        'user_email': email,
+        'login_url': users.create_login_url(),
+        'logout_url': users.create_logout_url('/'),
+        'firstName': fname,
+        'lastName': lname,
+        'username': username,
+        'upload_url': blobstore.create_upload_url('/upload_file')
+      }
+      render_template(self, 'uploadChallenge.html', page_params)
+    else:
+      self.redirect('/')
+
+
+class FileUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
+  def post(self):
+    email = get_user_email()
+    fname = ""
+    lname = ""
+    username = ""
+    if email:
+      qry = accountModel.get_by_id(users.get_current_user().user_id())
+      if qry:
+        fname = qry.firstName
+        lname = qry.lastName
+        username = qry.username
+      try:
+        upload = self.get_uploads()[0]
+        page_params = {
+          'user_email': email,
+          'login_url': users.create_login_url(),
+          'logout_url': users.create_logout_url('/'),
+          'key': upload.key()
+        }
+        file_upload = challengeModel(
+          ownerID=users.get_current_user().user_id(),
+          blob_key=upload.key(),
+          name=self.request.get('name'),
+          question=self.request.get('question'),
+          answer=self.request.get('answer'),
+          score=int(self.request.get('points'))
+        )
+        file_upload.put()
+        self.redirect('/uploaded/')
+        # self.redirect('/view_photo/%s' % upload.key())
+      except:
+        self.error(500)
+    else:
+      self.redirect('/')
+
+
+class ViewFileHandler(blobstore_handlers.BlobstoreDownloadHandler):
+  def get(self, file_key):
+    email = get_user_email()
+    fname = ""
+    lname = ""
+    username = ""
+    if email:
+      qry = accountModel.get_by_id(users.get_current_user().user_id())
+      if qry:
+        fname = qry.firstName
+        lname = qry.lastName
+        username = qry.username
+      page_params = {
+        'user_email': email,
+        'login_url': users.create_login_url(),
+        'logout_url': users.create_logout_url('/'),
+        'firstName': fname,
+        'lastName': lname,
+        'username': username,
+        "file": file_key,
+      }
+      if not blobstore.get(file_key):
+        self.error(404)
+      else:
+        self.send_blob(file_key)
+    else:
+      self.redirect('/')
+
+
+class uploadedHandler(webapp2.RequestHandler):
+  def get(self):
+    email = get_user_email()
+    fname = ""
+    lname = ""
+    username = ""
+    if email:
+      qry = accountModel.get_by_id(users.get_current_user().user_id())
+      if qry:
+        fname = qry.firstName
+        lname = qry.lastName
+        username = qry.username
+      page_params = {
+        'user_email': email,
+        'login_url': users.create_login_url(),
+        'logout_url': users.create_logout_url('/'),
+        'firstName': fname,
+        'lastName': lname,
+        'username': username,
+      }
+      render_template(self, 'uploadedChallenge.html', page_params)
+    else:
+      self.redirect('/')
+
+
+########################################################################################################################
+#############################################END SAM TESTING############################################################
+########################################################################################################################
 
 
 
@@ -622,6 +764,9 @@ mappings = [
   ('/solveChallenge', solveChallengeHandler),
   ('/acctManage', accountManagementHandler),
   ('/acctManageInfo', accountManageDisplay),
-  ('/leaderboard', leaderboardHandler)
+  ('/leaderboard', leaderboardHandler),
+  ('/upload_file', FileUploadHandler),
+  ('/view_files/([^/]+)?', ViewFileHandler),
+
 ]
 app = webapp2.WSGIApplication(mappings, debug=True)

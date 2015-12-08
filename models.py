@@ -25,9 +25,9 @@ class challengeModel(ndb.Model):
   ownerID = ndb.StringProperty()
   question = ndb.TextProperty()
   answer = ndb.TextProperty()
-  attachments = ndb.BlobProperty
   score = ndb.IntegerProperty()
   name = ndb.StringProperty()
+  blob_key = ndb.BlobKeyProperty()
 
 
 # Challenge Access table
@@ -42,3 +42,12 @@ class progressTable(ndb.Model):
   lobbyID = ndb.IntegerProperty()
   challengeID = ndb.StringProperty()
   ################## End NDB Models ####################
+
+
+
+
+
+class UserPhoto(ndb.Model):
+  user = ndb.StringProperty()
+  blob_key = ndb.BlobKeyProperty()
+

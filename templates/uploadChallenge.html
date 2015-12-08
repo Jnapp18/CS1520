@@ -2,7 +2,7 @@
 {% block bodycontent %}
   <div class="contentbkg">
     <h2 align="center">Challenge Upload</h2>
-    <form align="center" method="post" enctype="multipart/form-data">
+    <form align="center" action="{{ upload_url }}" method="post" enctype="multipart/form-data">
       Name:<br>
       <input name="name" type="text" required="true"><br><br>
       Question:<br>
