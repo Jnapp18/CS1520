@@ -2,6 +2,8 @@ Milestone 3
 ---------------
 TODO - High to low importance
 ------------------------------
+- Leverages memcache for performance. (directly impacts grade)
+
 - lobbies needs to get developed
 
 - need to actually get zip downloads working
@@ -13,6 +15,10 @@ TODO - High to low importance
 - flagging system to prevent inappropriate uploads
 
 - Only admin uploaded challenges count toward the leaderboard
+
+- Leverages one external API or App Engine Service (cron, blobstore, task queues, images, or an external API like Twitter, Google Maps, etc). (this should be handled by zip files)
+
+- No loose ends
 
 
 
