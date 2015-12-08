@@ -9,6 +9,7 @@
         <th>Question</th>
         <th>Answer</th>
         <th>Points</th>
+		
       </tr>
       {% for chal in challenges %}
         <tr>
@@ -16,13 +17,23 @@
           <td>{{ chal.question }}</td>
           <td>{{ chal.answer }}</td>
           <td>{{ chal.score }}</td>
-        </tr>
+		  <td>
+			<a href="/editChallenge?challengeId={{ chal.key }}">Edit
+		  </td>
+		</tr>
       {% endfor %}
     </table>
   </div>
+ 
   <!--<div class="contentbkg">
+  
+  <form method="post">
+		  <input style="color:black" type="submit" placeholder="{{ chal.key }}"value="Edit"></input>
+		  </form>
     <h2 align="center">Public Challenges:</h2>
-
+<form method="post">
+		  <input style="color:black" type="submit" placeholder="{{ chal.key }}"value="Edit"></input>
+		  </form>
     <table class="challenge-table" align="center" style="margin: 0px auto;">
       <tr>
         <th>Name</th>

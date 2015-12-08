@@ -19,6 +19,7 @@ from helperFunctions import *
 from models import *
 import webapp2
 import random
+import time
 from google.appengine.api import users, mail
 from google.appengine.ext.webapp import blobstore_handlers
 
@@ -356,6 +357,86 @@ class leaderboardHandler(webapp2.RequestHandler):
       'rank': rank
     }
     render_template(self, 'leaderboard.html', page_params)
+	
+class editChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
+	def get(self):
+	  email = get_user_email()
+	  fname = ""
+	  lname = ""
+	  username = ""
+	  challengeName = ""
+	  challengeQuestion = ""
+	  challengeAnswer = ""
+	  challengePoints = 0
+	  challengeId = self.request.get("challengeId")
+	  
+	  if email:
+	    userQry = accountModel.get_by_id(users.get_current_user().user_id())
+	    if userQry:
+	      fname = userQry.firstName
+	      lname = userQry.lastName
+	      username = userQry.username
+	  
+	  if challengeId:
+	    challengeNum = challengeId[22:-1]
+	    challenge = ndb.Key(challengeModel, int(challengeNum)).get()
+	    #qry = challengeModel.query(challengeModel.key == ndb.Key(challengeModel, challengeNum))
+	    #if challenge:
+	    challengeName = challenge.name
+	    challengeQuestion = challenge.question
+	    challengeAnswer = challenge.answer
+	    challengePoints = challenge.score
+	    
+	  
+	  page_params = {
+ 	   'user_email': email,
+        'firstName': fname,
+        'lastName': lname,
+        'username': username,
+		'challengeName': challengeName,
+		'challengeQuestion': challengeQuestion,
+		'challengeAnswer': challengeAnswer,
+		'challengePoints': challengePoints,
+        'login_url': users.create_login_url(),
+        'logout_url': users.create_logout_url('/')
+      }
+	  render_template(self, 'editChallenge.html', page_params)
+	  
+	def post(self):
+	  email = get_user_email()
+	  fname = ""
+	  lname = ""
+	  username = ""
+	  challengeId = self.request.get("challengeId")
+	  if email:
+	    qry = accountModel.get_by_id(users.get_current_user().user_id())
+	    if qry:
+	      fname = qry.firstName
+	      lname = qry.lastName
+	      username = qry.username
+        # updating the database with updated challenge information
+	    uploaded_file = self.get_uploads()
+	    if challengeId:
+	      challengeNum = challengeId[22:-1]
+	      Challenge = ndb.Key(challengeModel, int(challengeNum)).get()
+	      Challenge.question = self.request.get('question')
+	      Challenge.answer = self.request.get('answer')
+	      Challenge.attachments = uploaded_file
+	      Challenge.score = int(self.request.get('points'))
+	      Challenge.name = self.request.get('name')
+	      Challenge.put()
+	      page_params = {
+        'login_url': users.create_login_url(),
+        'logout_url': users.create_logout_url('/'),
+        'user_email': email,
+        'firstName': fname,
+        'lastName': lname,
+        'username': username
+        }
+	      time.sleep(0.2)  #There is a sleep timer here because the change will not appear when you redirect to manageChallenges.html unless you wait for 0.2 milliseconds
+	      self.redirect('/manageChallenges')
+	  else:
+	    self.redirect('/manageChallenges')
 ################## End Page Handlers ####################
 
 
@@ -373,6 +454,7 @@ mappings = [
   ('/solveChallenge', solveChallengeHandler),
   ('/acctManage', accountManagementHandler),
   ('/acctManageInfo', accountManageDisplay),
-  ('/leaderboard', leaderboardHandler)
+  ('/leaderboard', leaderboardHandler),
+  ('/editChallenge', editChallengeHandler)
 ]
 app = webapp2.WSGIApplication(mappings, debug=True)
