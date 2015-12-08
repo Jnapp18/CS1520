@@ -16,6 +16,7 @@
           <td>{{ chal.question }}</td>
           <td>{{ chal.answer }}</td>
           <td>{{ chal.score }}</td>
+          <td><a href="/editChallenge?challengeId={{ chal.key }}">Edit</td>
         </tr>
       {% endfor %}
     </table>
