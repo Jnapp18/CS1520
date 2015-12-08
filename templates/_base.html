@@ -69,67 +69,7 @@
     </div><!-- /.container-fluid -->
   </nav>
 
-
-
-  <!-- 
-  <div id="custom-bootstrap-menu" class="navbar navbar-default " role="navigation">
-    <div class="container-fluid">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-menubuilder"><span
-          class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span
-          class="icon-bar"></span></button>
-      </div>
-      {% if user_email %}
-        <div class="collapse navbar-collapse navbar-menubuilder">
-        <ul class="nav navbar-nav navbar-left">
-          <li class="logo">PittCTF</li>
-          <li><a href="/">Home</a></li>
-          <li><a href="/uploadChallenge">Upload Challenge</a></li>
-          <li><a href="/manageChallenges">My Challenges</a></li>
-          <li><a href="/Lobbies">Lobbies</a></li>
-          <li><a href="/leaderboard">Leaderboard</a></li>
-        </ul>
-        <div class="collapse navbar-collapse navbar-menubuilder">
-          <ul class="nav navbar-nav navbar-right">
-            <li data-toggle="dropdown"><a href="#">{{ user_email }} <span class="caret"></span></a></li>
-            <ul class="dropdown-menu">
-              {% if firstName and lastName and username %}
-              <li><a href="/acctManageInfo">My Account</a></li>
-              {% else %}
-              <li><a href="/acctManage">Manage Account</a></li>
-              {% endif %}
-              <li><a href="{{ logout_url }}">Sign Out</a></li>
-            </ul>
-          </ul>
-        </div>
-      {% else %}
-        <div class="collapse navbar-collapse navbar-menubuilder">
-          <ul class="nav navbar-nav navbar-left">
-            <li><a href="/">Home</a></li>
-          </ul>
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="{{ login_url }}">Sign In</a></li>
-          </ul>
-        </div>
-      {% endif %}
-      </ul>
-      </div>
-    </div>
-  </div> -->
 {% block bodycontent %}{% endblock %}
-  <div class="spacing">
-  </div>
-  <div id="jack-footer" class="navbar navbar-default navbar-fixed-bottom" role="navigation">
-    <div class="container-fluid">
-      <div class="navbar-header"><a class="navbar-brand" href="/">PittCTF</a></div>
-      <div class="collapse navbar-collapse navbar-menubuilder">
-        <ul class="nav navbar-nav navbar-right">
-          <li><a href="#" data-toggle="modal" data-target="#contact">Contact Us</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
 <!-- Trigger the modal with a button -->
 <!-- Modal -->
 <div id="contact" class="modal fade" role="dialog">
@@ -165,5 +105,17 @@
     </form>
   </div>
 </div>
+  <div class="spacing">
+  </div>
+  <div id="jack-footer" class="navbar navbar-default navbar-bottom" role="navigation">
+    <div class="container-fluid">
+      <div class="navbar-header"><a class="navbar-brand" href="/">PittCTF</a></div>
+      <div class="collapse navbar-collapse navbar-menubuilder">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#" data-toggle="modal" data-target="#contact">Contact Us</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
