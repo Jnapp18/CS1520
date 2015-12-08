@@ -1,0 +1,60 @@
+{% extends "_base.html" %}
+{% block bodycontent %}
+  <div class="contentbkg">
+    {% if numchallenges > 0 %}
+    <h2 align="center">Create New Lobby</h2>
+    <form align="center" method="post" enctype="multipart/form-data">
+      Lobby Name:<br>
+      <input name="name" type="text" required="true"><br><br>
+      <table class="challenge-table" align="center" style="margin: 0px auto;">
+        <tr>
+          <th>Name</th>
+          <th>Question</th>
+          <th>Points</th>
+          <th>Select</th>
+        </tr>
+        {% for chal in challenges %}
+          <tr>
+            <td><a href="#" data-toggle="modal" data-target="#chalInfo{{ forloop.counter }}">{{ chal.name }}</a></td>
+            <td>{{ chal.question }}</td>
+            <td>{{ chal.score }}</td>
+            <td><input type="checkbox" name="selectedQuestions" value="{{ chal.name }}"></td>
+          </tr>
+        {% endfor %}
+      </table><br>
+      <input class="btn btn-default" value="Create Lobby" type="submit">
+    </form>
+    {% else %}
+    <p class="chalquestion">You haven't created any challenges yet!<br>You need to create challenges to create a lobby!<br>Go create some!</p>
+    <div class="text-center"><a class="btn btn-default" href="/uploadChallenge">Create Challenge</a></div>
+    {% endif %}
+  </div>
+{% for chal in challenges %}
+<div id="chalInfo{{ forloop.counter }}" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <form class="form-horizontal" id="mailForm" method="post" action="email">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <p>{{ chal.name }}</p>
+      </div>
+      <div class="modal-body" id="myModalBody">
+        <div class="modal-body">
+          <h3><u>Question</u>:</h3>
+          <p class="chalM">{{ chal.question}}</p>
+          <h3><u>Answer</u>:</h3>
+          <p class="chalM">{{ chal.answer}}</p>
+          <h3><u>Points</u>:</h3>
+          <p class="chalM">{{ chal.score}}</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div>
+{% endfor %}
+
+{% endblock %}

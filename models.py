@@ -1,6 +1,5 @@
 from google.appengine.ext import ndb
 
-
 ################## NDB Models ####################
 # Account management table
 class accountModel(ndb.Model):

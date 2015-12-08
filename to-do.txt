@@ -30,7 +30,9 @@ DONT WORRY ABOUT THIS NOW
 
 JACK IS WORKING ON
 ---------------------
-- not sure yet
+- unique lobbies
+
+- on manage challenge page, if no challenges exist, "go make some" (from createLobby.html)
 
 
 

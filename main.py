@@ -19,6 +19,8 @@ from helperFunctions import *
 from models import *
 import webapp2
 import random
+import logging
+import time
 from google.appengine.api import users, mail
 from google.appengine.ext.webapp import blobstore_handlers
 
@@ -151,8 +153,64 @@ class LobbyHandler(webapp2.RequestHandler):
     }
     render_template(self, 'lobbies.html', page_params)
 
-# Challenge Handler
-class ChallengeHandler(webapp2.RequestHandler):
+#Create Lobby Handler
+class createLobbyHandler(webapp2.RequestHandler):
+  def get(self):
+    email = get_user_email()
+    fname = ""
+    lname = ""
+    username = ""
+    results = challengeModel.query(challengeModel.ownerID == users.get_current_user().user_id())
+    resultSize = 0
+    if(results.count()>0):
+      resultSize = 1
+    if email:
+      qry = accountModel.get_by_id(users.get_current_user().user_id())
+      if qry:
+        fname = qry.firstName
+        lname = qry.lastName
+        username = qry.username
+    page_params = {
+      'user_email': email,
+      'firstName': fname,
+      'lastName': lname,
+      'username': username,
+      'login_url': users.create_login_url(),
+      'logout_url': users.create_logout_url('/'),
+      'challenges': results,
+      'numchallenges': resultSize
+    }
+    render_template(self, 'createLobby.html', page_params)
+  def post(self):
+    email = get_user_email()
+    fname = ""
+    lname = ""
+    username = ""
+    if email:
+      qry = accountModel.get_by_id(users.get_current_user().user_id())
+      if qry:
+        fname = qry.firstName
+        lname = qry.lastName
+        username = qry.username
+      # updating the database with challenge information
+      selectedChals = self.request.get_all('selectedQuestions')
+      logging.debug(selectedChals)
+      logging.error(selectedChals)
+
+      page_params = {
+        'login_url': users.create_login_url(),
+        'logout_url': users.create_logout_url('/'),
+        'user_email': email,
+        'firstName': fname,
+        'lastName': lname,
+        'username': username
+      }
+      self.redirect('/manageChallenges')
+    else:
+      self.redirect('/')
+
+#Manage Lobby Handler
+class manageLobbyHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
     fname = ""
@@ -172,7 +230,6 @@ class ChallengeHandler(webapp2.RequestHandler):
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/')
     }
-    render_template(self, 'challenges.html', page_params)
 
 # manageChallenge Handler
 class manageChallengeHandler(webapp2.RequestHandler):
@@ -293,7 +350,6 @@ class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
       render_template(self, 'uploadChallenge.html', page_params)
     else:
       self.redirect('/')
-
   def post(self):
     email = get_user_email()
     fname = ""
@@ -316,6 +372,7 @@ class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
       Challenge.score = int(self.request.get('points'))
       Challenge.name = self.request.get('name')
       Challenge.put()
+      time.sleep(3)
       page_params = {
         'login_url': users.create_login_url(),
         'logout_url': users.create_logout_url('/'),
@@ -324,7 +381,7 @@ class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
         'lastName': lname,
         'username': username
       }
-      render_template(self, 'challenges.html', page_params)
+      self.redirect('/manageChallenges')
     else:
       self.redirect('/')
 
@@ -367,7 +424,8 @@ mappings = [
   ('/index', MainHandler),
   ('/email', EmailHandler),
   ('/publicLobby', LobbyHandler),
-  ('/Challenges', ChallengeHandler),
+  ('/createLobby', createLobbyHandler),
+  ('/manageLobbies', manageLobbyHandler),
   ('/manageChallenges', manageChallengeHandler),
   ('/uploadChallenge', uploadChallengeHandler),
   ('/solveChallenge', solveChallengeHandler),
