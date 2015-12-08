@@ -12,6 +12,7 @@ TODO - High to low importance
 
 - flagging system to prevent inappropriate uploads
 
+- Only admin uploaded challenges count toward the leaderboard
 
 
 
