@@ -14,13 +14,13 @@ class lobbyModel(ndb.Model):
   lobbyID = ndb.IntegerProperty()
   lobbyName = ndb.TextProperty()
   publicBool = ndb.BooleanProperty()
-  ownerID = ndb.IntegerProperty()
+  ownerID = ndb.StringProperty()
 
 
 # Lobby Access table
 class lobbyAccessModel(ndb.Model):
   lobbyID = ndb.IntegerProperty()
-  userID = ndb.IntegerProperty()
+  userID = ndb.StringProperty()
 
 
 # Challenge management table
@@ -36,7 +36,7 @@ class challengeModel(ndb.Model):
 
 # Challenge Access table
 class challengeAccessModel(ndb.Model):
-  challengeID = ndb.IntegerProperty()
+  challengeID = ndb.StringProperty()
   lobbyID = ndb.IntegerProperty()
 
 

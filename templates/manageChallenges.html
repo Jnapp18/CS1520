@@ -1,8 +1,8 @@
 {% extends "_base.html" %}
 {% block bodycontent %}
   <div class="contentbkg">
+    {% if numchallenges > 0 %}
     <h2 align="center">My Challenges:</h2>
-
     <table class="challenge-table" align="center" style="margin: 0px auto;">
       <tr>
         <th>Name</th>
@@ -20,25 +20,11 @@
         </tr>
       {% endfor %}
     </table>
+    <br>
+    <div class="text-center"><a class="btn btn-default" href="/uploadChallenge">Create More Challenges</a></div>
+    {% else %}
+    <p class="chalquestion">You haven't created any challenges yet!<br>You need to create challenges to create a lobby!<br>Go create some!</p>
+    <div class="text-center"><a class="btn btn-default" href="/uploadChallenge">Create Challenge</a></div>
+    {% endif %}
   </div>
-  <!--<div class="contentbkg">
-    <h2 align="center">Public Challenges:</h2>
-
-    <table class="challenge-table" align="center" style="margin: 0px auto;">
-      <tr>
-        <th>Name</th>
-        <th>Question</th>
-        <th>Answer</th>
-        <th>Points</th>
-      </tr>
-      {% for pChal in pChallenges %}
-        <tr>
-          <td>{{ pChal.name }}</td>
-          <td>{{ pChal.question }}</td>
-          <td>{{ pChal.answer }}</td>
-          <td>{{ pChal.score }}</td>
-        </tr>
-      {% endfor %}
-    </table>
-  </div>-->
 {% endblock %}

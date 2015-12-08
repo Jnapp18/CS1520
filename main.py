@@ -53,6 +53,7 @@ class MainHandler(webapp2.RequestHandler):
     }
     render_template(self, 'index.html', page_params)
 
+# Email handler.
 class EmailHandler(webapp2.RequestHandler):
   def post(self):
     email = get_user_email()
@@ -128,6 +129,7 @@ class accountManagementHandler(webapp2.RequestHandler):
     else:
       self.redirect('/')
 
+
 # Lobby Handler
 class LobbyHandler(webapp2.RequestHandler):
   def get(self):
@@ -193,10 +195,21 @@ class createLobbyHandler(webapp2.RequestHandler):
         lname = qry.lastName
         username = qry.username
       # updating the database with challenge information
-      selectedChals = self.request.get_all('selectedQuestions')
-      logging.debug(selectedChals)
-      logging.error(selectedChals)
-
+      lModel = lobbyModel()
+      lModel.lobbyID = 1
+      lModel.ownerID = users.get_current_user().user_id()
+      lModel.publicBool = True
+      lModel.lobbyName = self.request.get('lobbyname')
+      lModel.put()
+      lobbyChallengeList = self.request.get_all('selectedQuestions')
+      L_A_Model = lobbyAccessModel()
+      L_A_Model.lobbyID = 1
+      L_A_Model.ownerID = users.get_current_user().user_id()
+      for chals in lobbyChallengeList:
+        chalAccModel = challengeAccessModel()
+        chalAccModel.challengeID = chals
+        chalAccModel.lobbyID = 1
+      time.sleep(0.2)
       page_params = {
         'login_url': users.create_login_url(),
         'logout_url': users.create_logout_url('/'),
@@ -205,7 +218,7 @@ class createLobbyHandler(webapp2.RequestHandler):
         'lastName': lname,
         'username': username
       }
-      self.redirect('/manageChallenges')
+      self.redirect('/manageLobbies')
     else:
       self.redirect('/')
 
@@ -216,6 +229,10 @@ class manageLobbyHandler(webapp2.RequestHandler):
     fname = ""
     lname = ""
     username = ""
+    results = lobbyModel.query(lobbyModel.ownerID == users.get_current_user().user_id())
+    resultSize = 0
+    if(results.count()>0):
+      resultSize = 1
     if email:
       qry = accountModel.get_by_id(users.get_current_user().user_id())
       if qry:
@@ -226,10 +243,14 @@ class manageLobbyHandler(webapp2.RequestHandler):
       'user_email': email,
       'firstName': fname,
       'lastName': lname,
+      'lobbynum': resultSize,
+      'lobbies': results,
       'username': username,
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/')
     }
+    render_template(self, 'manageLobbies.html', page_params)
+
 
 # manageChallenge Handler
 class manageChallengeHandler(webapp2.RequestHandler):
@@ -239,6 +260,9 @@ class manageChallengeHandler(webapp2.RequestHandler):
     lname = ""
     username = ""
     results = challengeModel.query(challengeModel.ownerID == users.get_current_user().user_id())
+    resultSize = 0
+    if(results.count()>0):
+      resultSize = 1
     publicResults = challengeModel.query()
     if email:
       qry = accountModel.get_by_id(users.get_current_user().user_id())
@@ -254,6 +278,7 @@ class manageChallengeHandler(webapp2.RequestHandler):
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/'),
       'challenges': results,
+      'numchallenges': resultSize,
       'pChallenges': publicResults
     }
     render_template(self, 'manageChallenges.html', page_params)
@@ -385,35 +410,6 @@ class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
     else:
       self.redirect('/')
 
-# Leaderboard Handler
-class leaderboardHandler(webapp2.RequestHandler):
-  def get(self):
-    email = get_user_email()
-    fname = ""
-    lname = ""
-    username = ""
-    rank = 0
-    results = accountModel.query()
-    results = results.order(-accountModel.score)
-
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
-    page_params = {
-      'user_email': email,
-      'firstName': fname,
-      'lastName': lname,
-      'username': username,
-      'login_url': users.create_login_url(),
-      'logout_url': users.create_logout_url('/'),
-      'board': results,
-      'rank': rank
-    }
-    render_template(self, 'leaderboard.html', page_params)
-
 #Edit Challenge
 class editChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
   def get(self):
@@ -493,6 +489,36 @@ class editChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
         self.redirect('/manageChallenges')
     else:
       self.redirect('/manageChallenges')
+
+# Leaderboard Handler
+class leaderboardHandler(webapp2.RequestHandler):
+  def get(self):
+    email = get_user_email()
+    fname = ""
+    lname = ""
+    username = ""
+    rank = 0
+    results = accountModel.query()
+    results = results.order(-accountModel.score)
+
+    if email:
+      qry = accountModel.get_by_id(users.get_current_user().user_id())
+      if qry:
+        fname = qry.firstName
+        lname = qry.lastName
+        username = qry.username
+    page_params = {
+      'user_email': email,
+      'firstName': fname,
+      'lastName': lname,
+      'username': username,
+      'login_url': users.create_login_url(),
+      'logout_url': users.create_logout_url('/'),
+      'board': results,
+      'rank': rank
+    }
+    render_template(self, 'leaderboard.html', page_params)
+
 
 
 ################## End Page Handlers ####################
