@@ -2,24 +2,12 @@ Milestone 3
 ---------------
 TODO - High to low importance
 ------------------------------
-- Leverages memcache for performance. (directly impacts grade)
 
-- lobbies needs to get developed
+- Leverages memcache for performance. (directly impacts grade) look into this... may not implement
 
-- need to actually get zip downloads working
+- Make sure challenges look nice when questions are long
 
-- my challenges tab
-
-- leaderboard on per lobby basis
-
-- flagging system to prevent inappropriate uploads
-
-- Only admin uploaded challenges count toward the leaderboard
-
-- Leverages one external API or App Engine Service (cron, blobstore, task queues, images, or an external API like Twitter, Google Maps, etc). (this should be handled by zip files)
-
-- No loose ends
-
+- checkmark for completed q's
 
 
 DONT WORRY ABOUT THIS NOW
@@ -32,7 +20,14 @@ JACK IS WORKING ON
 ---------------------
 - unique lobbies
 
-- on manage challenge page, if no challenges exist, "go make some" (from createLobby.html)
+- lobbies needs to get developed
+
+- leaderboard on per lobby basis
+
+- Only admin uploaded challenges count toward the leaderboard
+
+- limit challenge name length and lobby name length
+
 
 
 
@@ -41,4 +36,8 @@ DONE
 -----------------------
 - answers need to be pulled through ajax, not stored in the web page
 - point tracking, keeping track of score
+- my challenges tab
+- need to actually get zip downloads working
+
+
 

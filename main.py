@@ -91,13 +91,22 @@ class accountManageDisplay(webapp2.RequestHandler):
 class accountManagementHandler(webapp2.RequestHandler):
   def get(self):
     email = get_user_email()
+    fname = ""
+    lname = ""
+    username = ""
     if email:
-      acctManage_url = '/acctManageInfo'
+      qry = accountModel.get_by_id(users.get_current_user().user_id())
+      if qry:
+        fname = qry.firstName
+        lname = qry.lastName
+        username = qry.username
       page_params = {
         'user_email': email,
         'login_url': users.create_login_url(),
         'logout_url': users.create_logout_url('/'),
-        'acctManage_url': acctManage_url
+        'firstName': fname,
+        'lastName': lname,
+        'username': username
       }
       render_template(self, 'acctManage.html', page_params)
     else:
@@ -109,6 +118,7 @@ class accountManagementHandler(webapp2.RequestHandler):
       fname = self.request.get('fname')
       lname = self.request.get('lname')
       username = self.request.get('username')
+
       # updating the database with account information
       AccountQry = accountModel.get_by_id(users.get_current_user().user_id())
       AcctModel = accountModel(id=users.get_current_user().user_id())
@@ -128,7 +138,6 @@ class accountManagementHandler(webapp2.RequestHandler):
       render_template(self, 'acctManageInfo.html', page_params)
     else:
       self.redirect('/')
-
 
 # Lobby Handler
 class LobbyHandler(webapp2.RequestHandler):
@@ -251,6 +260,35 @@ class manageLobbyHandler(webapp2.RequestHandler):
     }
     render_template(self, 'manageLobbies.html', page_params)
 
+#enterLobby
+class enterLobbyHandler(webapp2.RequestHandler):
+  def get(self):
+    email = get_user_email()
+    fname = ""
+    lname = ""
+    username = ""
+    lobbyID = self.request.get("lobbyID")
+    if email:
+      userQry = accountModel.get_by_id(users.get_current_user().user_id())
+      if userQry:
+        fname = userQry.firstName
+        lname = userQry.lastName
+        username = userQry.username
+    if lobbyID:
+      lobby = ndb.Key(urlsafe=lobbyID).get()
+      lobbyName = lobby.lobbyName
+      
+    
+    page_params = {
+    'user_email': email,
+    'firstName': fname,
+    'lastName': lname,
+    'username': username,
+    'lobbyName': lobbyName,
+    'login_url': users.create_login_url(),
+    'logout_url': users.create_logout_url('/')
+    }
+    render_template(self, 'lobby.html', page_params)
 
 # manageChallenge Handler
 class manageChallengeHandler(webapp2.RequestHandler):
@@ -468,8 +506,7 @@ class editChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
         # updating the database with updated challenge information
       uploaded_file = self.get_uploads()
       if challengeId:
-        challengeNum = challengeId[22:-1]
-        Challenge = ndb.Key(challengeModel, int(challengeNum)).get()
+        Challenge = ndb.Key(urlsafe=challengeId).get()
         Challenge.question = self.request.get('question')
         Challenge.answer = self.request.get('answer')
         Challenge.attachments = uploaded_file
@@ -533,6 +570,7 @@ mappings = [
   ('/publicLobby', LobbyHandler),
   ('/createLobby', createLobbyHandler),
   ('/manageLobbies', manageLobbyHandler),
+  ('/enterLobby', enterLobbyHandler),
   ('/manageChallenges', manageChallengeHandler),
   ('/editChallenge', editChallengeHandler),
   ('/uploadChallenge', uploadChallengeHandler),
