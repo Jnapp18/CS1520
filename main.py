@@ -430,8 +430,7 @@ class editChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
         username = userQry.username
     
     if challengeId:
-      challengeNum = challengeId[22:-1]
-      challenge = ndb.Key(challengeModel, int(challengeNum)).get()
+      challenge = ndb.Key(urlsafe=challengeId).get()
       #qry = challengeModel.query(challengeModel.key == ndb.Key(challengeModel, challengeNum))
       #if challenge:
       challengeName = challenge.name

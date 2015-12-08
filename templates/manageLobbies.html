@@ -10,7 +10,7 @@
       {% for lobby in lobbies %}
         <tr>
           <td>{{ lobby.lobbyName }}</td>
-          <td><a href="#">Enter</td>
+          <td><a href="/enterLobby?lobbyID={{ lobby.key.urlsafe }}">Enter</td>
         </tr>
       {% endfor %}
     </table>

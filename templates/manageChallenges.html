@@ -16,7 +16,7 @@
           <td>{{ chal.question }}</td>
           <td>{{ chal.answer }}</td>
           <td>{{ chal.score }}</td>
-          <td><a href="/editChallenge?challengeId={{ chal.key }}">Edit</td>
+          <td><a href="/editChallenge?challengeId={{ chal.key.urlsafe }}">Edit</td>
         </tr>
       {% endfor %}
     </table>
