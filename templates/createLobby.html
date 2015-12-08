@@ -18,7 +18,7 @@
             <td><a href="#" data-toggle="modal" data-target="#chalInfo{{ forloop.counter }}">{{ chal.name }}</a></td>
             <td>{{ chal.question }}</td>
             <td>{{ chal.score }}</td>
-            <td><input type="checkbox" name="selectedQuestions" value="{{ chal.name }}"></td>
+            <td><input type="checkbox" name="selectedQuestions" value="{{ chal.key }}"></td>
           </tr>
         {% endfor %}
       </table><br>

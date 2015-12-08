@@ -18,13 +18,15 @@ DONT WORRY ABOUT THIS NOW
 
 JACK IS WORKING ON
 ---------------------
+- solveChallenges should work for ANY lobbyID. the public one SHOULD display all of the admins challenges (jnapp18@gmail.com)
+
+- Leaderboard should be lobbyID specific
+
 - unique lobbies
 
 - lobbies needs to get developed
 
 - leaderboard on per lobby basis
-
-- Only admin uploaded challenges count toward the leaderboard
 
 - limit challenge name length and lobby name length
 

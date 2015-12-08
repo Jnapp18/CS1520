@@ -21,6 +21,7 @@ import webapp2
 import random
 import logging
 import time
+import re
 from google.appengine.api import users, mail
 from google.appengine.ext.webapp import blobstore_handlers
 
@@ -205,19 +206,22 @@ class createLobbyHandler(webapp2.RequestHandler):
         username = qry.username
       # updating the database with challenge information
       lModel = lobbyModel()
-      lModel.lobbyID = 1
       lModel.ownerID = users.get_current_user().user_id()
-      lModel.publicBool = True
       lModel.lobbyName = self.request.get('lobbyname')
       lModel.put()
+
       lobbyChallengeList = self.request.get_all('selectedQuestions')
       L_A_Model = lobbyAccessModel()
-      L_A_Model.lobbyID = 1
+      L_A_Model.lobbyID = lModel.key
       L_A_Model.ownerID = users.get_current_user().user_id()
       for chals in lobbyChallengeList:
         chalAccModel = challengeAccessModel()
-        chalAccModel.challengeID = chals
-        chalAccModel.lobbyID = 1
+        chalList = re.findall(r"[^\\,\'\W)]+", chals)
+        logging.error(chalList[1])
+        logging.error(chalList[2])
+        chalAccModel.challengeID = ndb.Key(chalList[1], long(chalList[2]))
+        chalAccModel.lobbyID = lModel.key
+        chalAccModel.put()
       time.sleep(0.2)
       page_params = {
         'login_url': users.create_login_url(),
@@ -267,28 +271,71 @@ class enterLobbyHandler(webapp2.RequestHandler):
     fname = ""
     lname = ""
     username = ""
-    lobbyID = self.request.get("lobbyID")
-    if email:
-      userQry = accountModel.get_by_id(users.get_current_user().user_id())
+    resultSize = 0
+    PittCTF = self.request.get("lobby")
+    if PittCTF == "PittCTF":
+      if email:
+        userQry = accountModel.get_by_id(users.get_current_user().user_id())
+      else:
+        self.redirect("/")
+      pubLobQry = lobbyModel.query(lobbyModel.ownerID == "120023531168187223130").get()
       if userQry:
         fname = userQry.firstName
         lname = userQry.lastName
         username = userQry.username
-    if lobbyID:
-      lobby = ndb.Key(urlsafe=lobbyID).get()
-      lobbyName = lobby.lobbyName
-      
-    
-    page_params = {
-    'user_email': email,
-    'firstName': fname,
-    'lastName': lname,
-    'username': username,
-    'lobbyName': lobbyName,
-    'login_url': users.create_login_url(),
-    'logout_url': users.create_logout_url('/')
-    }
-    render_template(self, 'lobby.html', page_params)
+      if pubLobQry:
+        lobbyName = pubLobQry.lobbyName
+        results = challengeModel.query(challengeModel.ownerID == "120023531168187223130")
+        if(results.count()>0):
+          resultSize = 1
+      page_params = {
+      'user_email': email,
+      'firstName': fname,
+      'lastName': lname,
+      'username': username,
+      'lobbyName': lobbyName,
+      'challenges': results,
+      'numchallenges': resultSize,
+      'login_url': users.create_login_url(),
+      'logout_url': users.create_logout_url('/')
+      }
+      render_template(self, 'lobby.html', page_params)
+    else:
+      lobbyID = self.request.get("lobbyID")
+      if email:
+        userQry = accountModel.get_by_id(users.get_current_user().user_id())
+      else:
+        self.redirect("/")
+      if userQry:
+        fname = userQry.firstName
+        lname = userQry.lastName
+        username = userQry.username
+      if lobbyID:
+        lobby = ndb.Key(urlsafe=lobbyID).get()
+        lobbyName = lobby.lobbyName
+        lobbyChalList = challengeAccessModel.query(challengeAccessModel.lobbyID == lobby.key)
+        chalList = []
+        i = 0
+        for l in lobbyChalList:
+          chalList.insert(i,l.challengeID)
+          i = i + 1
+        results = challengeModel.query(challengeModel.key.IN(chalList))
+        if(results.count()>0):
+          resultSize = 1
+
+
+      page_params = {
+      'user_email': email,
+      'firstName': fname,
+      'lastName': lname,
+      'username': username,
+      'lobbyName': lobbyName,
+      'challenges': results,
+      'numchallenges': resultSize,
+      'login_url': users.create_login_url(),
+      'logout_url': users.create_logout_url('/')
+      }
+      render_template(self, 'lobby.html', page_params)    
 
 # manageChallenge Handler
 class manageChallengeHandler(webapp2.RequestHandler):
@@ -427,7 +474,6 @@ class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
       # updating the database with challenge information
       uploaded_file = self.get_uploads()
       Challenge = challengeModel()
-      Challenge.challengeID = random.randint(1, 1000)
       Challenge.ownerID = users.get_current_user().user_id()
       Challenge.question = self.request.get('question')
       Challenge.answer = self.request.get('answer')
@@ -567,7 +613,6 @@ mappings = [
   ('/', MainHandler),
   ('/index', MainHandler),
   ('/email', EmailHandler),
-  ('/publicLobby', LobbyHandler),
   ('/createLobby', createLobbyHandler),
   ('/manageLobbies', manageLobbyHandler),
   ('/enterLobby', enterLobbyHandler),
