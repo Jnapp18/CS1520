@@ -3,13 +3,13 @@
 <div class="contentbkg">
 	<h2 align="center">Manage Account</h2>
 	<form align="center" method="post" enctype="multipart/form-data" action="{{upload_url}}">
-	First Name<br>
-	<input name="fname" type="text"><br><br><br>
-	Last Name:<br>
-	<input name="lname" type="text"><br><br><br>
-	Username:<br>
-	<input name="username" type="text"><br><br><br>
-	<input type="submit">
+	<p class="actm">First Name</p>
+	<input name="fname" type="text" required><br><br><br>
+	<p class="actm">Last Name:</p>
+	<input name="lname" type="text" required><br><br><br>
+	<p class="actm">Username:</p>
+	<input name="username" type="text" required><br><br><br>
+	<input class="btn btn-default" type="submit">
 	</form>
 </div>
 {% endblock %}

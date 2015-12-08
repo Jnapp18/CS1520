@@ -447,7 +447,7 @@ mappings = [
   ('/', MainHandler),
   ('/index', MainHandler),
   ('/email', EmailHandler),
-  ('/Lobbies', LobbyHandler),
+  ('/publicLobby', LobbyHandler),
   ('/Challenges', ChallengeHandler),
   ('/manageChallenges', manageChallengeHandler),
   ('/uploadChallenge', uploadChallengeHandler),
