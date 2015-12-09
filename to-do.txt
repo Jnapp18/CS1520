@@ -11,6 +11,11 @@ TODO - High to low importance
 
 - back button for returning to lobby after solving question
 
+- LIMIT CHALLENGE QUESTION LENGTH
+
+- LIMIT LOBBY TITLE LENGTH
+
+- LIMIT LOBBY PASSWORD LENGTH
 
 JACK IS WORKING ON
 ---------------------
