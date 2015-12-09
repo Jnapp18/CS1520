@@ -2,11 +2,12 @@
 {% block bodycontent %}
   <div class="contentbkg">
     <h2 align="center">Create Challenge</h2>
+    <div class="text-center">
     <form align="center" method="post" enctype="multipart/form-data">
       Name:<br>
       <input name="name" type="text"  maxlength="30" required="true"><br><br>
       Question:<br>
-      <textarea cols="40" rows="5" name="question" required></textarea><br><br>
+      <textarea cols="40" rows="5" name="question" maxlength="2000" required></textarea><br><br>
       Answer:<br>
       <input name="answer" type="text" required="true"><br><br>
       Points:<br>
@@ -16,5 +17,6 @@
       <br><br>
       <input class="btn btn-default" value="Upload Challenge" type="submit">
     </form>
+    </div>
   </div>
 {% endblock %}

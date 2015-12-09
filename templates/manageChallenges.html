@@ -3,12 +3,14 @@
   <div class="contentbkg">
     {% if numchallenges > 0 %}
     <h2 align="center">My Challenges:</h2>
-    <table class="challenge-table" align="center" style="margin: 0px auto;">
+    <div class="table-responsive">
+    <table class="challenge-table">
       <tr>
         <th>Name</th>
         <th>Question</th>
         <th>Answer</th>
         <th>Points</th>
+        <th></th>
       </tr>
       {% for chal in challenges %}
         <tr>
@@ -20,8 +22,10 @@
         </tr>
       {% endfor %}
     </table>
+    </div>
     <br>
-    <div class="text-center"><a class="btn btn-default" href="/uploadChallenge">Create More Challenges</a></div>
+    <div class="text-center"><a class="btn btn-default" href="/uploadChallenge">Create More Challenges</a></div><br>
+    <div class="text-center"><a class="btn btn-default" href="/createLobby">Create a Lobby</a></div>
     {% else %}
     <p class="chalquestion">You haven't created any challenges yet!<br>You need to create challenges to create a lobby!<br>Go create some!</p>
     <div class="text-center"><a class="btn btn-default" href="/uploadChallenge">Create Challenge</a></div>

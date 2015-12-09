@@ -2,7 +2,8 @@
 {% block bodycontent %}
   <div class="contentbkg">
     <h2 align="center">Edit Challenge</h2>
-    <form align="center" method="post" enctype="multipart/form-data">
+    <div class="text-center">
+    <form method="post" enctype="multipart/form-data">
       Name:<br>
       <input name="name" type="text"  maxlength="30" required="true"><br><br>
       Question:<br>
@@ -16,5 +17,6 @@
       <br><br>
       <input class="btn btn-default" value="Save Changes" type="submit">
     </form>
+    </div>
   </div>
 {% endblock %}

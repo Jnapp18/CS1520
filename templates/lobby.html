@@ -3,7 +3,8 @@
   <div class="contentbkg">
     <h2 align="center">{{ lobbyName }}</h2>
     <div class="text-center"><a class="btn btn-default" href="/leaderboard?lobbyID={{ lobbyID.urlsafe }}">View Leaderboard</a></div><br>
-    <table class="challenge-table" align="center" style="margin: 0px auto;">
+    <div class="table-responsive">
+    <table class="challenge-table">
       <tr>
         <th>Name</th>
         <th>Question</th>
@@ -15,9 +16,27 @@
           <td><a href="/solveChallenge?lobbyID={{ lobbyID.urlsafe }}&amp;chal_id={{ chal.key.urlsafe }}">{{ chal.name }}</a></td>
           <td>{{ chal.question }}</td>
           <td>{{ chal.score }}</td>
-          <td>X<!-- <span class="glyphicon glyphicon-ok"></span> --></td>
+          <td id="completed{{forloop.counter}}"><span class="glyphicon glyphicon-remove"></span>"</td>
+          {% if prog == "none" %}
+          <script>
+            document.getElementById("completed{{forloop.counter}}").innerHTML = "<span class=\"glyphicon glyphicon-remove\"></span>";
+          </script>
+          {% else %}
+            {% for p in prog %}
+              {% if p.challengeID == chal.key %}
+                <script>
+                  document.getElementById("completed{{forloop.parentloop.counter}}").innerHTML = "<span class=\"glyphicon glyphicon-ok\"></span>";
+                </script>
+              {% else %}
+                <script>
+                  document.getElementById("completed{{forloop.parentloop.counter}}").innerHTML = "<span class=\"glyphicon glyphicon-remove\"></span>";
+                </script>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
         </tr>
       {% endfor %}
     </table>
+    </div>
   </div>
 {% endblock %}

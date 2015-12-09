@@ -3,7 +3,8 @@
   <div class="contentbkg">
     {% if lobbynum > 0 %}
     <h2 align="center">My Lobbies:</h2>
-    <table class="challenge-table" align="center" style="margin: 0px auto;">
+    <div class="table-responsive">
+    <table class="challenge-table">
       <tr>
         <th></th>
         <th>Lobby Name</th>
@@ -25,9 +26,11 @@
     <div class="text-center"><a class="btn btn-default" href="/createLobby">Create Lobby</a></div>
     {% endif %}
   </div>
+  </div>
   <div class="contentbkg">
     <h2 align="center">All Lobbies:</h2>
-    <table class="challenge-table" align="center" style="margin: 0px auto;">
+    <div class="table-responsive">
+    <table class="challenge-table">
       <tr>
         <th></th>
         <th>Lobby Name</th>
@@ -41,5 +44,6 @@
         </tr>
       {% endfor %}
     </table>
+    </div>
   </div>
 {% endblock %}

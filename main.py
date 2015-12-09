@@ -278,6 +278,9 @@ class enterLobbyHandler(webapp2.RequestHandler):
     username = ""
     resultSize = 0
     lobbyName = ""
+    prog = ""
+    lobbyID = ""
+    results = ""
     PittCTF = self.request.get("lobby")
     if PittCTF == "PittCTF":
       print 'do nothing'
@@ -297,6 +300,7 @@ class enterLobbyHandler(webapp2.RequestHandler):
       if pubLobQry:
         lobbyName = pubLobQry.lobbyName
         lobbyID = pubLobQry.key
+        prog = progressTable.query(progressTable.lobbyID == lobbyID, progressTable.userID == users.get_current_user().user_id())
         results = challengeModel.query(challengeModel.ownerID == "118168406204694893029")
         if(results.count()>0):
           resultSize = 1
@@ -305,6 +309,7 @@ class enterLobbyHandler(webapp2.RequestHandler):
       'firstName': fname,
       'lastName': lname,
       'username': username,
+      'prog': prog,
       'lobbyName': lobbyName,
       'lobbyID': lobbyID,
       'challenges': results,
@@ -336,7 +341,9 @@ class enterLobbyHandler(webapp2.RequestHandler):
             chalList.insert(i,l.challengeID)
             i = i + 1
           results = challengeModel.query(challengeModel.key.IN(chalList))
-
+          prog = progressTable.query(progressTable.lobbyID == lobbyID, progressTable.userID == users.get_current_user().user_id())
+          if prog == None:
+            prog = "none"
           if(results.count()>0):
             resultSize = 1
           page_params = {
@@ -344,6 +351,7 @@ class enterLobbyHandler(webapp2.RequestHandler):
           'firstName': fname,
           'lastName': lname,
           'username': username,
+          'prog': prog,
           'lobbyName': lobbyName,
           'lobbyID': lobbyID,
           'challenges': results,
