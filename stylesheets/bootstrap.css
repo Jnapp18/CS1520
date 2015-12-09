@@ -157,6 +157,7 @@ a {
   white-space: nowrap;
   overflow: hidden;
   max-width: 300px;
+  min-width: 150px;
   text-overflow: ellipsis;
 
 }

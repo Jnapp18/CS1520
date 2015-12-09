@@ -280,6 +280,11 @@ class enterLobbyHandler(webapp2.RequestHandler):
     lobbyName = ""
     PittCTF = self.request.get("lobby")
     if PittCTF == "PittCTF":
+      print 'do nothing'
+    else:
+      lobbyID = self.request.get("lobbyID")
+      lobby = ndb.Key(urlsafe=lobbyID).get()
+    if PittCTF == "PittCTF" or lobby.lobbyName == "PittCTF Public Lobby":
       if email:
         userQry = accountModel.get_by_id(users.get_current_user().user_id())
       else:
@@ -309,7 +314,6 @@ class enterLobbyHandler(webapp2.RequestHandler):
       }
       render_template(self, 'lobby.html', page_params)
     else:
-      lobbyID = self.request.get("lobbyID")
       if email:
         userQry = accountModel.get_by_id(users.get_current_user().user_id())
       else:
@@ -332,6 +336,7 @@ class enterLobbyHandler(webapp2.RequestHandler):
             chalList.insert(i,l.challengeID)
             i = i + 1
           results = challengeModel.query(challengeModel.key.IN(chalList))
+
           if(results.count()>0):
             resultSize = 1
           page_params = {
