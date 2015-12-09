@@ -22,6 +22,7 @@ import random
 import logging
 import time
 import re
+from google.appengine.api import memcache
 from google.appengine.api import users, mail
 from google.appengine.ext.webapp import blobstore_handlers
 
@@ -35,15 +36,10 @@ class MainHandler(webapp2.RequestHandler):
     fname = ""
     lname = ""
     username = ""
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
-      else:  # THIS IS WHERE I DID WORK. IF FIRST TIME USER, ADD THEM TO THE NDB, SEND THEM AN EMAIL -sk
-        user = accountModel(id=users.get_current_user().user_id(), firstName=fname, lastName=lname, username=email.split("@", 1)[0], score=0)
-        accountModel.put(user)
+    if memcache_usage():
+      fname = memcache.get("user_fname")
+      lname = memcache.get("user_lname")
+      username = memcache.get("user_username")
     page_params = {
       'user_email': email,
       'firstName': fname,
@@ -72,12 +68,10 @@ class accountManageDisplay(webapp2.RequestHandler):
     fname = ""
     lname = ""
     username = ""
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+    if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
     page_params = {
       'user_email': email,
       'firstName': fname,
@@ -95,13 +89,11 @@ class accountManagementHandler(webapp2.RequestHandler):
     fname = ""
     lname = ""
     username = ""
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
-      page_params = {
+    if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
+        page_params = {
         'user_email': email,
         'login_url': users.create_login_url(),
         'logout_url': users.create_logout_url('/'),
@@ -109,7 +101,7 @@ class accountManagementHandler(webapp2.RequestHandler):
         'lastName': lname,
         'username': username
       }
-      render_template(self, 'acctManage.html', page_params)
+        render_template(self, 'acctManage.html', page_params)
     else:
       self.redirect('/')
 
@@ -148,12 +140,10 @@ class LobbyHandler(webapp2.RequestHandler):
     lname = ""
     username = ""
     results = challengeModel.query()
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+    if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
     page_params = {
       'user_email': email,
       'firstName': fname,
@@ -176,12 +166,10 @@ class createLobbyHandler(webapp2.RequestHandler):
     resultSize = 0
     if(results.count()>0):
       resultSize = 1
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+    if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
     page_params = {
       'user_email': email,
       'firstName': fname,
@@ -199,11 +187,10 @@ class createLobbyHandler(webapp2.RequestHandler):
     lname = ""
     username = ""
     if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+      if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
       # updating the database with challenge information
       lModel = lobbyModel()
       lModel.ownerID = users.get_current_user().user_id()
@@ -247,11 +234,10 @@ class manageLobbyHandler(webapp2.RequestHandler):
     if(results.count()>0):
       resultSize = 1
     if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+      if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
     page_params = {
       'user_email': email,
       'firstName': fname,
@@ -271,6 +257,7 @@ class enterLobbyHandler(webapp2.RequestHandler):
     fname = ""
     lname = ""
     username = ""
+    lobbyName = ""
     resultSize = 0
     PittCTF = self.request.get("lobby")
     if PittCTF == "PittCTF":
@@ -349,12 +336,10 @@ class manageChallengeHandler(webapp2.RequestHandler):
     if(results.count()>0):
       resultSize = 1
     publicResults = challengeModel.query()
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+    if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
     page_params = {
       'user_email': email,
       'firstName': fname,
@@ -378,12 +363,10 @@ class solveChallengeHandler(webapp2.RequestHandler):
     chal_id = self.request.get('chal_id')
     user_id = users.get_current_user().user_id()
     solved = 0 #not yet solved
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+    if memcache_usage():
+      fname = memcache.get("user_fname")
+      lname = memcache.get("user_lname")
+      username = memcache.get("user_username")
       chalObject = challengeModel.query(challengeModel.name == str(chal_id)).get()
       progTable = progressTable.query(progressTable.userID == user_id, progressTable.challengeID == chal_id).get()
       if progTable:
@@ -443,12 +426,10 @@ class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
     fname = ""
     lname = ""
     username = ""
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+    if memcache_usage():
+      fname = memcache.get("user_fname")
+      lname = memcache.get("user_lname")
+      username = memcache.get("user_username")
       page_params = {
         'user_email': email,
         'firstName': fname,
@@ -465,12 +446,10 @@ class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
     fname = ""
     lname = ""
     username = ""
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+    if memcache_usage():
+      fname = memcache.get("user_fname")
+      lname = memcache.get("user_lname")
+      username = memcache.get("user_username")
       # updating the database with challenge information
       uploaded_file = self.get_uploads()
       Challenge = challengeModel()
@@ -506,12 +485,10 @@ class editChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
     challengeAnswer = ""
     challengePoints = 0
     challengeId = self.request.get("challengeId")
-    if email:
-      userQry = accountModel.get_by_id(users.get_current_user().user_id())
-      if userQry:
-        fname = userQry.firstName
-        lname = userQry.lastName
-        username = userQry.username
+    if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
     
     if challengeId:
       challenge = ndb.Key(urlsafe=challengeId).get()
@@ -543,12 +520,10 @@ class editChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
     lname = ""
     username = ""
     challengeId = self.request.get("challengeId")
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+    if memcache_usage():
+      fname = memcache.get("user_fname")
+      lname = memcache.get("user_lname")
+      username = memcache.get("user_username")
         # updating the database with updated challenge information
       uploaded_file = self.get_uploads()
       if challengeId:
@@ -583,12 +558,10 @@ class leaderboardHandler(webapp2.RequestHandler):
     results = accountModel.query()
     results = results.order(-accountModel.score)
 
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+    if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
     page_params = {
       'user_email': email,
       'firstName': fname,
@@ -600,94 +573,29 @@ class leaderboardHandler(webapp2.RequestHandler):
       'rank': rank
     }
     render_template(self, 'leaderboard.html', page_params)
-<<<<<<< HEAD
-	
-class editChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
-	def get(self):
-	  email = get_user_email()
-	  fname = ""
-	  lname = ""
-	  username = ""
-	  challengeName = ""
-	  challengeQuestion = ""
-	  challengeAnswer = ""
-	  challengePoints = 0
-	  challengeId = self.request.get("challengeId")
-	  
-	  if email:
-	    userQry = accountModel.get_by_id(users.get_current_user().user_id())
-	    if userQry:
-	      fname = userQry.firstName
-	      lname = userQry.lastName
-	      username = userQry.username
-	  
-	  if challengeId:
-	    challengeNum = challengeId[22:-1]
-	    challenge = ndb.Key(challengeModel, int(challengeNum)).get()
-	    #qry = challengeModel.query(challengeModel.key == ndb.Key(challengeModel, challengeNum))
-	    #if challenge:
-	    challengeName = challenge.name
-	    challengeQuestion = challenge.question
-	    challengeAnswer = challenge.answer
-	    challengePoints = challenge.score
-	    
-	  
-	  page_params = {
- 	   'user_email': email,
-        'firstName': fname,
-        'lastName': lname,
-        'username': username,
-		'challengeName': challengeName,
-		'challengeQuestion': challengeQuestion,
-		'challengeAnswer': challengeAnswer,
-		'challengePoints': challengePoints,
-        'login_url': users.create_login_url(),
-        'logout_url': users.create_logout_url('/')
-      }
-	  render_template(self, 'editChallenge.html', page_params)
-	  
-	def post(self):
-	  email = get_user_email()
-	  fname = ""
-	  lname = ""
-	  username = ""
-	  challengeId = self.request.get("challengeId")
-	  if email:
-	    qry = accountModel.get_by_id(users.get_current_user().user_id())
-	    if qry:
-	      fname = qry.firstName
-	      lname = qry.lastName
-	      username = qry.username
-        # updating the database with updated challenge information
-	    uploaded_file = self.get_uploads()
-	    if challengeId:
-	      challengeNum = challengeId[22:-1]
-	      Challenge = ndb.Key(challengeModel, int(challengeNum)).get()
-	      Challenge.question = self.request.get('question')
-	      Challenge.answer = self.request.get('answer')
-	      Challenge.attachments = uploaded_file
-	      Challenge.score = int(self.request.get('points'))
-	      Challenge.name = self.request.get('name')
-	      Challenge.put()
-	      page_params = {
-        'login_url': users.create_login_url(),
-        'logout_url': users.create_logout_url('/'),
-        'user_email': email,
-        'firstName': fname,
-        'lastName': lname,
-        'username': username
-        }
-	      time.sleep(0.2)  #There is a sleep timer here because the change will not appear when you redirect to manageChallenges.html unless you wait for 0.2 milliseconds
-	      self.redirect('/manageChallenges')
-	  else:
-	    self.redirect('/manageChallenges')
-=======
-
-
-
->>>>>>> 664914641e9e276cdd23ff6dade38ff3aca1fe87
 ################## End Page Handlers ####################
 
+def memcache_usage():
+	email = get_user_email()
+	if email:
+		if memcache.get("user_"):
+			return True
+		else:
+			qry = accountModel.get_by_id(users.get_current_user().user_id())
+			if qry:
+				fname = qry.firstName
+				lname = qry.lastName
+				username = qry.username
+			else:  # THIS IS WHERE I DID WORK. IF FIRST TIME USER, ADD THEM TO THE NDB, SEND THEM AN EMAIL -sk
+				user = accountModel(id=users.get_current_user().user_id(), firstName=fname, lastName=lname, username=email.split("@", 1)[0], score=0)
+				accountModel.put(user)
+		
+			memcache.set_multi({"fname": fname,
+						"lname": lname,
+						"username": username},
+						key_prefix="user_", time=3600)
+			return True
+	return False
 
 
 ################## url Mappings. ####################
