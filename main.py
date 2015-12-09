@@ -670,6 +670,9 @@ class leaderboardHandler(webapp2.RequestHandler):
 
 def memcache_usage():
 	email = get_user_email()
+	fname = ''
+	lname = ''
+	username = ''
 	if email:
 		if memcache.get("user_"):
 			return True
