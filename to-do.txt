@@ -22,10 +22,6 @@ JACK IS WORKING ON
 
 - Leaderboard should be lobbyID specific
 
-- unique lobbies
-
-- lobbies needs to get developed
-
 - leaderboard on per lobby basis
 
 - limit challenge name length and lobby name length
@@ -40,6 +36,8 @@ DONE
 - point tracking, keeping track of score
 - my challenges tab
 - need to actually get zip downloads working
+- unique lobbies
+- lobbies needs to get developed
 
 
 

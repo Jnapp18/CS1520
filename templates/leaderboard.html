@@ -9,11 +9,11 @@
             <th>Username</th>
             <th>Score</th>
         </tr>
-        {% for player in board %}
+        {% for b in board %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ player.username }}</td>
-                <td>{{ player.score }}</td>
+                <td>{{ b.0 }}</td>
+                <td>{{ b.1 }}</td>
             </tr>
         {% endfor %}
     </table>

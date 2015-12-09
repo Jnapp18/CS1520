@@ -64,7 +64,8 @@ function here()
 {
     var userAnswer = $('input[name=answer]').val();
     var xmlHttp = createXmlHttp();
-    var chalID = "{{ chalObject.name }}";
+    var chalID = "{{ chalObject.key.urlsafe }}";
+    var lobbyID = "{{ lobbyID.urlsafe }}";
     xmlHttp.onreadystatechange=function() 
     {
         if(xmlHttp.readyState == 4) 
@@ -87,7 +88,7 @@ function here()
                 alert("Error: status code is " + xmlHttp.status);
         }
     }
-    postParameters(xmlHttp, '/solveChallenge?userAnswer='+userAnswer+'&chal_id='+chalID);
+    postParameters(xmlHttp, '/solveChallenge?userAnswer='+userAnswer+'&chal_id='+chalID+'&lobbyID='+lobbyID);
 
     return false;
 }

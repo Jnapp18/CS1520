@@ -21,6 +21,7 @@ import webapp2
 import random
 import logging
 import time
+from operator import itemgetter
 import re
 from google.appengine.api import users, mail
 from google.appengine.ext.webapp import blobstore_handlers
@@ -42,7 +43,11 @@ class MainHandler(webapp2.RequestHandler):
         lname = qry.lastName
         username = qry.username
       else:  # THIS IS WHERE I DID WORK. IF FIRST TIME USER, ADD THEM TO THE NDB, SEND THEM AN EMAIL -sk
-        user = accountModel(id=users.get_current_user().user_id(), firstName=fname, lastName=lname, username=email.split("@", 1)[0], score=0)
+        lm = lobbyModel.query(lobbyModel.ownerID == "120023531168187223130").get()
+        if lm:
+          publob = lobbyAccessModel(lobbyID=lm.key, userID=users.get_current_user().user_id())
+          lobbyAccessModel.put(publob)
+        user = accountModel(id=users.get_current_user().user_id(), firstName=fname, lastName=lname, username=email.split("@", 1)[0])
         accountModel.put(user)
     page_params = {
       'user_email': email,
@@ -126,7 +131,6 @@ class accountManagementHandler(webapp2.RequestHandler):
       AcctModel.firstName = fname
       AcctModel.lastName = lname
       AcctModel.username = username
-      AcctModel.score = AccountQry.score
       AcctModel.put()
       page_params = {
         'login_url': users.create_login_url(),
@@ -214,6 +218,7 @@ class createLobbyHandler(webapp2.RequestHandler):
       L_A_Model = lobbyAccessModel()
       L_A_Model.lobbyID = lModel.key
       L_A_Model.ownerID = users.get_current_user().user_id()
+      L_A_Model.put()
       for chals in lobbyChallengeList:
         chalAccModel = challengeAccessModel()
         chalList = re.findall(r"[^\\,\'\W)]+", chals)
@@ -272,6 +277,7 @@ class enterLobbyHandler(webapp2.RequestHandler):
     lname = ""
     username = ""
     resultSize = 0
+    lobbyName = ""
     PittCTF = self.request.get("lobby")
     if PittCTF == "PittCTF":
       if email:
@@ -285,6 +291,7 @@ class enterLobbyHandler(webapp2.RequestHandler):
         username = userQry.username
       if pubLobQry:
         lobbyName = pubLobQry.lobbyName
+        lobbyID = pubLobQry.key
         results = challengeModel.query(challengeModel.ownerID == "120023531168187223130")
         if(results.count()>0):
           resultSize = 1
@@ -294,6 +301,7 @@ class enterLobbyHandler(webapp2.RequestHandler):
       'lastName': lname,
       'username': username,
       'lobbyName': lobbyName,
+      'lobbyID': lobbyID,
       'challenges': results,
       'numchallenges': resultSize,
       'login_url': users.create_login_url(),
@@ -313,6 +321,7 @@ class enterLobbyHandler(webapp2.RequestHandler):
       if lobbyID:
         lobby = ndb.Key(urlsafe=lobbyID).get()
         lobbyName = lobby.lobbyName
+        lobbyID = lobby.key
         lobbyChalList = challengeAccessModel.query(challengeAccessModel.lobbyID == lobby.key)
         chalList = []
         i = 0
@@ -322,14 +331,13 @@ class enterLobbyHandler(webapp2.RequestHandler):
         results = challengeModel.query(challengeModel.key.IN(chalList))
         if(results.count()>0):
           resultSize = 1
-
-
       page_params = {
       'user_email': email,
       'firstName': fname,
       'lastName': lname,
       'username': username,
       'lobbyName': lobbyName,
+      'lobbyID': lobbyID,
       'challenges': results,
       'numchallenges': resultSize,
       'login_url': users.create_login_url(),
@@ -375,8 +383,13 @@ class solveChallengeHandler(webapp2.RequestHandler):
     fname = ""
     lname = ""
     username = ""
+    lobbyID = self.request.get('lobbyID')
     chal_id = self.request.get('chal_id')
+
+    challenge = ndb.Key(urlsafe=chal_id).get()
+    lobby = ndb.Key(urlsafe=lobbyID).get()
     user_id = users.get_current_user().user_id()
+
     solved = 0 #not yet solved
     if email:
       qry = accountModel.get_by_id(users.get_current_user().user_id())
@@ -384,8 +397,8 @@ class solveChallengeHandler(webapp2.RequestHandler):
         fname = qry.firstName
         lname = qry.lastName
         username = qry.username
-      chalObject = challengeModel.query(challengeModel.name == str(chal_id)).get()
-      progTable = progressTable.query(progressTable.userID == user_id, progressTable.challengeID == chal_id).get()
+      chalObject = challengeModel.query(challengeModel.name == challenge.name).get()
+      progTable = progressTable.query(progressTable.userID == user_id, progressTable.challengeID == challenge.key, progressTable.lobbyID == lobby.key).get()
       if progTable:
         #if query exists where userID and ChallengeID already exist, then we know they have solved this one
         solved = 1
@@ -393,6 +406,7 @@ class solveChallengeHandler(webapp2.RequestHandler):
         solved = 0
     page_params = {
       'solved': solved,
+      'lobbyID': lobby.key,
       'user_email': email,
       'firstName': fname,
       'lastName': lname,
@@ -405,14 +419,16 @@ class solveChallengeHandler(webapp2.RequestHandler):
   def post(self):
     email = get_user_email()
     chal_id = self.request.get('chal_id')
+    lobbyID = self.request.get('lobbyID')
+    challenge = ndb.Key(urlsafe=chal_id).get()
+    lobby = ndb.Key(urlsafe=lobbyID).get()
     userAnswer = self.request.get('userAnswer')
     user_id = users.get_current_user().user_id()
     if email:
-      chalObject = challengeModel.query(challengeModel.name == str(chal_id)).get()
-      chalScore = chalObject.score
-      if userAnswer == chalObject.answer:
+      chalScore = challenge.score
+      if userAnswer == challenge.answer:
         self.response.out.write('Correct')
-        progTable = progressTable.query(progressTable.userID == user_id, progressTable.challengeID == chal_id).get()
+        progTable = progressTable.query(progressTable.userID == user_id, progressTable.lobbyID == lobby.key, progressTable.challengeID == challenge.key).get()
         if progTable:
           print "should not be in here"#because you not be able to get to this method if the question is already
                                       # answered you cannot submit again. If a user is sneaky with the url
@@ -420,15 +436,15 @@ class solveChallengeHandler(webapp2.RequestHandler):
         else:
           AccountQry = accountModel.get_by_id(users.get_current_user().user_id())
           AcctModel = accountModel(id=users.get_current_user().user_id())
-          AcctModel.score = AccountQry.score + chalScore
           AcctModel.firstName = AccountQry.firstName
           AcctModel.lastName = AccountQry.lastName
           AcctModel.username = AccountQry.username
           AcctModel.put()
           progTableUpdate = progressTable()
           progTableUpdate.userID = user_id
-          progTableUpdate.lobbyID = 1
-          progTableUpdate.challengeID = chal_id
+          progTableUpdate.lobbyID = lobby.key
+          progTableUpdate.score = chalScore
+          progTableUpdate.challengeID = challenge.key
           progTableUpdate.put()
       else:
         self.response.out.write('Incorrect')
@@ -580,9 +596,25 @@ class leaderboardHandler(webapp2.RequestHandler):
     lname = ""
     username = ""
     rank = 0
-    results = accountModel.query()
-    results = results.order(-accountModel.score)
-
+    lobbyID = self.request.get('lobbyID')
+    lobby = ndb.Key(urlsafe=lobbyID).get()
+    progTable = progressTable.query(progressTable.lobbyID == lobby.key)
+    # userID 
+    # score 
+    leaderboardList = []
+    for p in progTable:
+      qry = accountModel.get_by_id(p.userID)
+      if (len(leaderboardList) == 0):
+        leaderboardList.append((qry.username, p.score))
+      else:
+        try:
+          index = [x[0] for x in leaderboardList].index(qry.username)
+          leaderboardList[index] = ( (qry.username, ( p.score + leaderboardList[index][1] )))
+        except ValueError:
+          thing_index = -1
+          leaderboardList.append((qry.username, p.score))
+    leaderboardList = sorted(leaderboardList,key=itemgetter(1))
+    leaderboardList.reverse()
     if email:
       qry = accountModel.get_by_id(users.get_current_user().user_id())
       if qry:
@@ -596,7 +628,7 @@ class leaderboardHandler(webapp2.RequestHandler):
       'username': username,
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/'),
-      'board': results,
+      'board': leaderboardList,
       'rank': rank
     }
     render_template(self, 'leaderboard.html', page_params)
