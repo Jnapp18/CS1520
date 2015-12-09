@@ -672,7 +672,7 @@ class FileUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             score=int(self.request.get('points'))
           )
         file_upload.put()
-        self.redirect('/uploaded')
+        self.redirect('/uploaded/')
         # self.redirect('/view_photo/%s' % upload.key())
       except:
         self.error(500)
@@ -742,7 +742,8 @@ mappings = [
   ('/uploadChallenge', FileUploadFormHandler),
   ('/upload_file', FileUploadHandler),
   ('/view_file/([^/]+)?', ViewFileHandler),
-  ('/uploaded', uploadedHandler),
+  ('/uploaded*', uploadedHandler),
+  ('/uploaded/*', uploadedHandler),
 
 ]
 app = webapp2.WSGIApplication(mappings, debug=True)
