@@ -549,45 +549,41 @@ class editChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
       'challengeAnswer': challengeAnswer,
       'challengePoints': challengePoints,
       'login_url': users.create_login_url(),
-      'logout_url': users.create_logout_url('/')
+      'logout_url': users.create_logout_url('/'),
+      'upload_url': blobstore.create_upload_url('/upload_file')
     }
     render_template(self, 'editChallenge.html', page_params)
 
   def post(self):
     email = get_user_email()
-    fname = ""
-    lname = ""
-    username = ""
-    challengeId = self.request.get("challengeId")
     if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
-        # updating the database with updated challenge information
-      uploaded_file = self.get_uploads()
-      if challengeId:
-        Challenge = ndb.Key(urlsafe=challengeId).get()
-        Challenge.question = self.request.get('question')
-        Challenge.answer = self.request.get('answer')
-        Challenge.attachments = uploaded_file
-        Challenge.score = int(self.request.get('points'))
-        Challenge.name = self.request.get('name')
-        Challenge.put()
-        page_params = {
-          'login_url': users.create_login_url(),
-          'logout_url': users.create_logout_url('/'),
-          'user_email': email,
-          'firstName': fname,
-          'lastName': lname,
-          'username': username
-        }
-        time.sleep(
-          0.2)  # There is a sleep timer here because the change will not appear when you redirect to manageChallenges.html unless you wait for 0.2 milliseconds
+      try:
+        if len(self.get_uploads()) == 1:
+          upload = self.get_uploads()[0]
+          file_upload = challengeModel(
+            ownerID=users.get_current_user().user_id(),
+            blob_key=upload.key(),
+            name=self.request.get('name'),
+            question=self.request.get('question'),
+            answer=self.request.get('answer'),
+            score=int(self.request.get('points'))
+          )
+        else:
+          file_upload = challengeModel(
+            ownerID=users.get_current_user().user_id(),
+            name=self.request.get('name'),
+            question=self.request.get('question'),
+            answer=self.request.get('answer'),
+            score=int(self.request.get('points'))
+          )
+        file_upload.put()
+        time.sleep(0.2)  # There is a sleep timer here because the change will not appear when you redirect to manageChallenges.html unless you wait for 0.2 milliseconds
         self.redirect('/manageChallenges')
+        # self.redirect('/view_photo/%s' % upload.key())
+      except:
+        self.error(500)
     else:
-      self.redirect('/manageChallenges')
+      self.redirect('/')
 
 
 # Leaderboard Handler
