@@ -212,13 +212,11 @@ class createLobbyHandler(webapp2.RequestHandler):
       lModel = lobbyModel()
       lModel.ownerID = users.get_current_user().user_id()
       lModel.lobbyName = self.request.get('lobbyname')
+      lModel.lobbyPass = self.request.get('lobbypass')
       lModel.put()
-
       lobbyChallengeList = self.request.get_all('selectedQuestions')
-      L_A_Model = lobbyAccessModel()
-      L_A_Model.lobbyID = lModel.key
-      L_A_Model.ownerID = users.get_current_user().user_id()
-      L_A_Model.put()
+      publob = lobbyAccessModel(lobbyID=lModel.key, userID=users.get_current_user().user_id())
+      lobbyAccessModel.put(publob)
       for chals in lobbyChallengeList:
         chalAccModel = challengeAccessModel()
         chalList = re.findall(r"[^\\,\'\W)]+", chals)
@@ -248,6 +246,7 @@ class manageLobbyHandler(webapp2.RequestHandler):
     lname = ""
     username = ""
     results = lobbyModel.query(lobbyModel.ownerID == users.get_current_user().user_id())
+    results2 = lobbyModel.query()
     resultSize = 0
     if(results.count()>0):
       resultSize = 1
@@ -263,6 +262,7 @@ class manageLobbyHandler(webapp2.RequestHandler):
       'lastName': lname,
       'lobbynum': resultSize,
       'lobbies': results,
+      'alllobbies': results2,
       'username': username,
       'login_url': users.create_login_url(),
       'logout_url': users.create_logout_url('/')
@@ -322,28 +322,61 @@ class enterLobbyHandler(webapp2.RequestHandler):
         lobby = ndb.Key(urlsafe=lobbyID).get()
         lobbyName = lobby.lobbyName
         lobbyID = lobby.key
-        lobbyChalList = challengeAccessModel.query(challengeAccessModel.lobbyID == lobby.key)
-        chalList = []
-        i = 0
-        for l in lobbyChalList:
-          chalList.insert(i,l.challengeID)
-          i = i + 1
-        results = challengeModel.query(challengeModel.key.IN(chalList))
-        if(results.count()>0):
-          resultSize = 1
-      page_params = {
-      'user_email': email,
-      'firstName': fname,
-      'lastName': lname,
-      'username': username,
-      'lobbyName': lobbyName,
-      'lobbyID': lobbyID,
-      'challenges': results,
-      'numchallenges': resultSize,
-      'login_url': users.create_login_url(),
-      'logout_url': users.create_logout_url('/')
-      }
-      render_template(self, 'lobby.html', page_params)    
+        lamQ = lobbyAccessModel.query(lobbyAccessModel.lobbyID == lobbyID, lobbyAccessModel.userID == users.get_current_user().user_id()).get()
+        #HE HAS ACCESS!
+        if lamQ:
+          lobbyChalList = challengeAccessModel.query(challengeAccessModel.lobbyID == lobby.key)
+          chalList = []
+          i = 0
+          for l in lobbyChalList:
+            chalList.insert(i,l.challengeID)
+            i = i + 1
+          results = challengeModel.query(challengeModel.key.IN(chalList))
+          if(results.count()>0):
+            resultSize = 1
+          page_params = {
+          'user_email': email,
+          'firstName': fname,
+          'lastName': lname,
+          'username': username,
+          'lobbyName': lobbyName,
+          'lobbyID': lobbyID,
+          'challenges': results,
+          'numchallenges': resultSize,
+          'login_url': users.create_login_url(),
+          'logout_url': users.create_logout_url('/')
+          }
+          render_template(self, 'lobby.html', page_params)  
+        #promt for password
+        else:
+          page_params = {
+          'user_email': email,
+          'firstName': fname,
+          'lastName': lname,
+          'username': username,
+          'lobbyName': lobbyName,
+          'lobbyID': lobbyID,
+          'login_url': users.create_login_url(),
+          'logout_url': users.create_logout_url('/')
+          }
+          render_template(self, 'lobbySignIn.html', page_params)  
+  def post(self):
+    email = get_user_email()
+    password = self.request.get('password')
+    lobbyID = self.request.get('lobbyID')
+    lobby = ndb.Key(urlsafe=lobbyID).get()
+    user_id = users.get_current_user().user_id()
+    if email:
+      if lobby.lobbyPass == password:
+        #do the lam stuff
+        publob = lobbyAccessModel(lobbyID=lobby.key, userID=users.get_current_user().user_id())
+        lobbyAccessModel.put(publob)
+        time.sleep(1)
+        self.response.out.write('Correct')
+      else:
+        self.response.out.write('Incorrect')
+
+
 
 # manageChallenge Handler
 class manageChallengeHandler(webapp2.RequestHandler):

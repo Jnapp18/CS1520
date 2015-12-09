@@ -10,6 +10,7 @@ class accountModel(ndb.Model):
 # Lobby management table
 class lobbyModel(ndb.Model):
   lobbyName = ndb.TextProperty()
+  lobbyPass = ndb.TextProperty()
   ownerID = ndb.StringProperty()
 
 

@@ -1,0 +1,77 @@
+{% extends "_base.html" %}
+{% block bodycontent %}
+  <div class="contentbkg">
+    <h2 align="center">Sign In:  {{ lobbyName }}</h2>
+    <form align="center" onSubmit="return here()">
+      <p class="chalquestion">You do not have access to this lobby.<br>Enter the password to gain access.</p>
+      <br>
+      Password:
+      <input name="lobbypass" type="password" required="true"><br><br>
+      <div id="answered"></div>
+      <br><br>
+      <input class="btn btn-default" value="Join Lobby" type="submit">
+    </form>
+    <br>
+  </div>
+<script>
+  function here() 
+  {
+      var userAnswer = $('input[name=lobbypass]').val();
+      var xmlHttp = createXmlHttp();
+      var lobbyID = "{{ lobbyID.urlsafe }}";
+      xmlHttp.onreadystatechange=function() 
+      {
+          if(xmlHttp.readyState == 4) 
+          {
+              if (xmlHttp.status == 200)
+              {
+                  var data = xmlHttp.responseText;
+                  if(data == "Correct")
+                  {
+                    // window.location.replace("http://localhost:8080/");
+                    document.location = "/enterLobby?lobbyID="+lobbyID;
+                  }
+                  else
+                  {
+                    var d = document.getElementById('answered');
+                    d.innerHTML = "Invalid Password";
+                  }
+              }
+              else if (xmlHttp.status == 404)
+                  alert("Request URL does not exist");
+              else
+                  alert("Error: status code is " + xmlHttp.status);
+          }
+      }
+      postParameters(xmlHttp, '/enterLobby?password='+userAnswer+'&lobbyID='+lobbyID);
+
+      return false;
+  }
+  function createXmlHttp()
+  {
+      var xmlhttp;
+      if (window.XMLHttpRequest)
+      {
+          xmlhttp = new XMLHttpRequest();
+      }
+      else
+      {
+          xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+      }
+      if (!(xmlhttp))
+      {
+          alert("Your browser does not support AJAX!");
+      }
+      return xmlhttp;
+  }
+  function postParameters(xmlHttp, target) 
+  {
+      if (xmlHttp)
+      {
+          xmlHttp.open("POST",target,true);
+          xmlHttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+          xmlHttp.send();
+      }
+  }
+</script>
+{% endblock %}
