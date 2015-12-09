@@ -43,7 +43,7 @@ class MainHandler(webapp2.RequestHandler):
         lname = qry.lastName
         username = qry.username
       else:  # THIS IS WHERE I DID WORK. IF FIRST TIME USER, ADD THEM TO THE NDB, SEND THEM AN EMAIL -sk
-        lm = lobbyModel.query(lobbyModel.ownerID == "120023531168187223130").get()
+        lm = lobbyModel.query(lobbyModel.ownerID == "118168406204694893029 ").get()
         if lm:
           publob = lobbyAccessModel(lobbyID=lm.key, userID=users.get_current_user().user_id())
           lobbyAccessModel.put(publob)
@@ -284,7 +284,7 @@ class enterLobbyHandler(webapp2.RequestHandler):
         userQry = accountModel.get_by_id(users.get_current_user().user_id())
       else:
         self.redirect("/")
-      pubLobQry = lobbyModel.query(lobbyModel.ownerID == "120023531168187223130").get()
+      pubLobQry = lobbyModel.query(lobbyModel.ownerID == "118168406204694893029").get()
       if userQry:
         fname = userQry.firstName
         lname = userQry.lastName
@@ -292,7 +292,7 @@ class enterLobbyHandler(webapp2.RequestHandler):
       if pubLobQry:
         lobbyName = pubLobQry.lobbyName
         lobbyID = pubLobQry.key
-        results = challengeModel.query(challengeModel.ownerID == "120023531168187223130")
+        results = challengeModel.query(challengeModel.ownerID == "118168406204694893029")
         if(results.count()>0):
           resultSize = 1
       page_params = {
@@ -376,8 +376,6 @@ class enterLobbyHandler(webapp2.RequestHandler):
       else:
         self.response.out.write('Incorrect')
 
-
-
 # manageChallenge Handler
 class manageChallengeHandler(webapp2.RequestHandler):
   def get(self):
@@ -460,12 +458,12 @@ class solveChallengeHandler(webapp2.RequestHandler):
     if email:
       chalScore = challenge.score
       if userAnswer == challenge.answer:
-        self.response.out.write('Correct')
         progTable = progressTable.query(progressTable.userID == user_id, progressTable.lobbyID == lobby.key, progressTable.challengeID == challenge.key).get()
         if progTable:
-          print "should not be in here"#because you not be able to get to this method if the question is already
-                                      # answered you cannot submit again. If a user is sneaky with the url
-                                      #This will prevent the user from gaining points
+          self.response.out.write('Correct')
+          #because you not be able to get to this method if the question is already
+          # answered you cannot submit again. If a user is sneaky with the url
+          #This will prevent the user from gaining points
         else:
           AccountQry = accountModel.get_by_id(users.get_current_user().user_id())
           AcctModel = accountModel(id=users.get_current_user().user_id())
@@ -479,6 +477,16 @@ class solveChallengeHandler(webapp2.RequestHandler):
           progTableUpdate.score = chalScore
           progTableUpdate.challengeID = challenge.key
           progTableUpdate.put()
+          Challenge = challengeModel()
+          Challenge.ownerID = users.get_current_user().user_id()
+          Challenge.question = challenge.question
+          Challenge.answer = challenge.answer
+          Challenge.attachments = challenge.attachments
+          Challenge.score = challenge.score
+          Challenge.name = challenge.name
+          Challenge.put()
+          self.response.out.write('Correct')
+          time.sleep(0.2)
       else:
         self.response.out.write('Incorrect')
       
@@ -629,8 +637,16 @@ class leaderboardHandler(webapp2.RequestHandler):
     lname = ""
     username = ""
     rank = 0
+    pubLobQry = lobbyModel.query(lobbyModel.ownerID == "118168406204694893029").get()
     lobbyID = self.request.get('lobbyID')
-    lobby = ndb.Key(urlsafe=lobbyID).get()
+
+    if lobbyID:
+      logging.error("hehehasjdflkjadf")
+      lobby = ndb.Key(urlsafe=lobbyID).get()
+    else:
+      logging.error(pubLobQry.key)
+      lobbyID = pubLobQry.key
+      lobby = pubLobQry
     progTable = progressTable.query(progressTable.lobbyID == lobby.key)
     # userID 
     # score 
@@ -654,23 +670,21 @@ class leaderboardHandler(webapp2.RequestHandler):
         fname = qry.firstName
         lname = qry.lastName
         username = qry.username
-    page_params = {
-      'user_email': email,
-      'firstName': fname,
-      'lastName': lname,
-      'username': username,
-      'login_url': users.create_login_url(),
-      'logout_url': users.create_logout_url('/'),
-      'board': leaderboardList,
-      'rank': rank
-    }
-    render_template(self, 'leaderboard.html', page_params)
-
-
-
+      page_params = {
+        'user_email': email,
+        'firstName': fname,
+        'lastName': lname,
+        'username': username,
+        'lobby': lobby,
+        'login_url': users.create_login_url(),
+        'logout_url': users.create_logout_url('/'),
+        'board': leaderboardList,
+        'rank': rank
+      }
+      render_template(self, 'leaderboard.html', page_params)
+    else:
+      self.redirect('/')
 ################## End Page Handlers ####################
-
-
 
 ################## url Mappings. ####################
 # When a URL is clicked, goes to the function to take care of the specific request.
