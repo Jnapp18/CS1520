@@ -657,16 +657,24 @@ class FileUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
     email = get_user_email()
     if email:
       try:
-        upload = self.get_uploads()[0]
-        print len(self.get_uploads())
-        file_upload = challengeModel(
-          ownerID=users.get_current_user().user_id(),
-          blob_key=upload.key(),
-          name=self.request.get('name'),
-          question=self.request.get('question'),
-          answer=self.request.get('answer'),
-          score=int(self.request.get('points'))
-        )
+        if len(self.get_uploads()) == 1:
+          upload = self.get_uploads()[0]
+          file_upload = challengeModel(
+            ownerID=users.get_current_user().user_id(),
+            blob_key=upload.key(),
+            name=self.request.get('name'),
+            question=self.request.get('question'),
+            answer=self.request.get('answer'),
+            score=int(self.request.get('points'))
+          )
+        else:
+          file_upload = challengeModel(
+            ownerID=users.get_current_user().user_id(),
+            name=self.request.get('name'),
+            question=self.request.get('question'),
+            answer=self.request.get('answer'),
+            score=int(self.request.get('points'))
+          )
         file_upload.put()
         self.redirect('/uploaded')
         # self.redirect('/view_photo/%s' % upload.key())
@@ -730,7 +738,7 @@ mappings = [
   ('/enterLobby', enterLobbyHandler),
   ('/manageChallenges', manageChallengeHandler),
   ('/editChallenge', editChallengeHandler),
-  #('/uploadChallenge', uploadChallengeHandler),
+  # ('/uploadChallenge', uploadChallengeHandler),
   ('/solveChallenge', solveChallengeHandler),
   ('/acctManage', accountManagementHandler),
   ('/acctManageInfo', accountManageDisplay),
