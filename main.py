@@ -20,8 +20,8 @@ import re
 import time
 
 import webapp2
-from google.appengine.api import mail, users
-from google.appengine.ext import blobstore, ndb
+from google.appengine.api import mail
+from google.appengine.ext import blobstore
 from google.appengine.ext.webapp import blobstore_handlers
 
 from helperFunctions import *
@@ -347,7 +347,7 @@ class enterLobbyHandler(webapp2.RequestHandler):
       }
       render_template(self, 'lobby.html', page_params)
 
-    # manageChallenge Handler
+      # manageChallenge Handler
 
 
 class manageChallengeHandler(webapp2.RequestHandler):
@@ -655,23 +655,10 @@ class FileUploadFormHandler(webapp2.RequestHandler):
 class FileUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
   def post(self):
     email = get_user_email()
-    fname = ""
-    lname = ""
-    username = ""
     if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
       try:
         upload = self.get_uploads()[0]
-        page_params = {
-          'user_email': email,
-          'login_url': users.create_login_url(),
-          'logout_url': users.create_logout_url('/'),
-          'key': upload.key()
-        }
+        print len(self.get_uploads())
         file_upload = challengeModel(
           ownerID=users.get_current_user().user_id(),
           blob_key=upload.key(),
@@ -681,7 +668,7 @@ class FileUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
           score=int(self.request.get('points'))
         )
         file_upload.put()
-        self.redirect('/uploaded/')
+        self.redirect('/uploaded')
         # self.redirect('/view_photo/%s' % upload.key())
       except:
         self.error(500)
@@ -692,24 +679,7 @@ class FileUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
 class ViewFileHandler(blobstore_handlers.BlobstoreDownloadHandler):
   def get(self, file_key):
     email = get_user_email()
-    fname = ""
-    lname = ""
-    username = ""
     if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
-      page_params = {
-        'user_email': email,
-        'login_url': users.create_login_url(),
-        'logout_url': users.create_logout_url('/'),
-        'firstName': fname,
-        'lastName': lname,
-        'username': username,
-        "file": file_key,
-      }
       if not blobstore.get(file_key):
         self.error(404)
       else:
@@ -760,13 +730,15 @@ mappings = [
   ('/enterLobby', enterLobbyHandler),
   ('/manageChallenges', manageChallengeHandler),
   ('/editChallenge', editChallengeHandler),
-  ('/uploadChallenge', uploadChallengeHandler),
+  #('/uploadChallenge', uploadChallengeHandler),
   ('/solveChallenge', solveChallengeHandler),
   ('/acctManage', accountManagementHandler),
   ('/acctManageInfo', accountManageDisplay),
   ('/leaderboard', leaderboardHandler),
+  ('/uploadChallenge', FileUploadFormHandler),
   ('/upload_file', FileUploadHandler),
-  ('/view_files/([^/]+)?', ViewFileHandler),
+  ('/view_file/([^/]+)?', ViewFileHandler),
+  ('/uploaded', uploadedHandler),
 
 ]
 app = webapp2.WSGIApplication(mappings, debug=True)
