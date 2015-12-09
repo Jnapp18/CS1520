@@ -6,11 +6,11 @@ class accountModel(ndb.Model):
   firstName = ndb.StringProperty()
   lastName = ndb.StringProperty()
   username = ndb.StringProperty()
-  score = ndb.IntegerProperty(default=0)
 
 # Lobby management table
 class lobbyModel(ndb.Model):
   lobbyName = ndb.TextProperty()
+  lobbyPass = ndb.TextProperty()
   ownerID = ndb.StringProperty()
 
 
@@ -39,6 +39,7 @@ class challengeAccessModel(ndb.Model):
 # progress tracking table
 class progressTable(ndb.Model):
   userID = ndb.StringProperty()
-  lobbyID = ndb.IntegerProperty()
-  challengeID = ndb.StringProperty()
+  lobbyID = ndb.KeyProperty()
+  challengeID = ndb.KeyProperty()
+  score = ndb.IntegerProperty(default=0)
   ################## End NDB Models ####################

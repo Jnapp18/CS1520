@@ -148,8 +148,18 @@ a {
 .challenge-table {
   text-align: center;
   margin: 1em 0;
-  min-width: 300px;
+  display: block;
+  max-width: 300px;
   border-collapse: collapse;
+  table-layout:fixed;
+}
+.challenge-table td {
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 300px;
+  min-width: 150px;
+  text-overflow: ellipsis;
+
 }
 .challenge-table a, .challenge-table a:hover, .challenge-table a:visited, a:active {
     color: #ffd464;   

@@ -1,19 +1,18 @@
 {% extends "_base.html" %}
 {% block bodycontent %}
 <div class="contentbkg">
-    <h2 align="center">Leaderboard</h2>
-    <p id="acct">High Scores</p>
+    <h2 align="center"><u>Leaderboard</u><br><br>{{lobby.lobbyName}}</h2>
     <table class="challenge-table" align="center" style="margin: 0px auto;">
         <tr>
             <th>Rank</th>
             <th>Username</th>
             <th>Score</th>
         </tr>
-        {% for player in board %}
+        {% for b in board %}
             <tr>
                 <td>{{ forloop.counter }}</td>
-                <td>{{ player.username }}</td>
-                <td>{{ player.score }}</td>
+                <td>{{ b.0 }}</td>
+                <td>{{ b.1 }}</td>
             </tr>
         {% endfor %}
     </table>

@@ -7,30 +7,18 @@ TODO - High to low importance
 
 - Make sure challenges look nice when questions are long
 
-- checkmark for completed q's
+- checkmark for completed q's???????????????
 
+- back button for returning to lobby after solving question
 
-DONT WORRY ABOUT THIS NOW
---------------------------
-- How should we format ndb models so that users have access to lobbies, can create lobbies, blah blah blah
-- public leaderboard only reflects admin uploaded challenges
+- LIMIT CHALLENGE QUESTION LENGTH
 
+- LIMIT LOBBY TITLE LENGTH
+
+- LIMIT LOBBY PASSWORD LENGTH
 
 JACK IS WORKING ON
 ---------------------
-- solveChallenges should work for ANY lobbyID. the public one SHOULD display all of the admins challenges (jnapp18@gmail.com)
-
-- Leaderboard should be lobbyID specific
-
-- unique lobbies
-
-- lobbies needs to get developed
-
-- leaderboard on per lobby basis
-
-- limit challenge name length and lobby name length
-
-
 
 
 
@@ -40,6 +28,11 @@ DONE
 - point tracking, keeping track of score
 - my challenges tab
 - need to actually get zip downloads working
-
+- unique lobbies
+- lobbies needs to get developed
+- solveChallenges should work for ANY lobbyID. the public one SHOULD display all of the admins challenges (jnapp18@gmail.com)
+- Leaderboard should be lobbyID specific
+- leaderboard on per lobby basis
+- limit challenge name length and lobby name length
 
 

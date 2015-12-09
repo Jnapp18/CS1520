@@ -4,11 +4,11 @@
 	<h2 align="center">Manage Account</h2>
 	<form align="center" method="post" enctype="multipart/form-data">
 	<p class="actm">First Name</p>
-	<input name="fname" type="text" value="{{firstName}}" required><br><br><br>
+	<input name="fname" type="text" value="{{firstName}}" maxlength="30" required><br><br><br>
 	<p class="actm">Last Name:</p>
-	<input name="lname" type="text" value="{{lastName}}" required><br><br><br>
+	<input name="lname" type="text" value="{{lastName}}" maxlength="50" required><br><br><br>
 	<p class="actm">Username:</p>
-	<input name="username" type="text" value="{{username}}" required><br><br><br>
+	<input name="username" type="text" value="{{username}}" maxlength="20" required><br><br><br>
 	<input class="btn btn-default" type="submit">
 	</form>
 </div>
