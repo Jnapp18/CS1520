@@ -220,8 +220,6 @@ class createLobbyHandler(webapp2.RequestHandler):
       for chals in lobbyChallengeList:
         chalAccModel = challengeAccessModel()
         chalList = re.findall(r"[^\\,\'\W)]+", chals)
-        logging.error(chalList[1])
-        logging.error(chalList[2])
         chalAccModel.challengeID = ndb.Key(chalList[1], long(chalList[2]))
         chalAccModel.lobbyID = lModel.key
         chalAccModel.put()
@@ -250,6 +248,9 @@ class manageLobbyHandler(webapp2.RequestHandler):
     resultSize = 0
     if(results.count()>0):
       resultSize = 1
+    resultSize2 = 0
+    if(results2.count()>0):
+      resultSize2 = 1
     if email:
       qry = accountModel.get_by_id(users.get_current_user().user_id())
       if qry:
@@ -261,6 +262,7 @@ class manageLobbyHandler(webapp2.RequestHandler):
       'firstName': fname,
       'lastName': lname,
       'lobbynum': resultSize,
+      'lobbynum2': resultSize2,
       'lobbies': results,
       'alllobbies': results2,
       'username': username,
@@ -654,49 +656,53 @@ class leaderboardHandler(webapp2.RequestHandler):
     lobbyID = self.request.get('lobbyID')
 
     if lobbyID:
-      logging.error("hehehasjdflkjadf")
       lobby = ndb.Key(urlsafe=lobbyID).get()
     else:
-      logging.error(pubLobQry.key)
-      lobbyID = pubLobQry.key
-      lobby = pubLobQry
-    progTable = progressTable.query(progressTable.lobbyID == lobby.key)
-    # userID 
-    # score 
-    leaderboardList = []
-    for p in progTable:
-      qry = accountModel.get_by_id(p.userID)
-      if (len(leaderboardList) == 0):
-        leaderboardList.append((qry.username, p.score))
+      if not pubLobQry:
+        pubLobQry = 'break'
       else:
-        try:
-          index = [x[0] for x in leaderboardList].index(qry.username)
-          leaderboardList[index] = ( (qry.username, ( p.score + leaderboardList[index][1] )))
-        except ValueError:
-          thing_index = -1
-          leaderboardList.append((qry.username, p.score))
-    leaderboardList = sorted(leaderboardList,key=itemgetter(1))
-    leaderboardList.reverse()
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
-      page_params = {
-        'user_email': email,
-        'firstName': fname,
-        'lastName': lname,
-        'username': username,
-        'lobby': lobby,
-        'login_url': users.create_login_url(),
-        'logout_url': users.create_logout_url('/'),
-        'board': leaderboardList,
-        'rank': rank
-      }
-      render_template(self, 'leaderboard.html', page_params)
-    else:
+        lobbyID = pubLobQry.key
+        lobby = pubLobQry
+    if pubLobQry == 'break':
       self.redirect('/')
+    else:
+      progTable = progressTable.query(progressTable.lobbyID == lobby.key)
+      # userID 
+      # score 
+      leaderboardList = []
+      for p in progTable:
+        qry = accountModel.get_by_id(p.userID)
+        if (len(leaderboardList) == 0):
+          leaderboardList.append((qry.username, p.score))
+        else:
+          try:
+            index = [x[0] for x in leaderboardList].index(qry.username)
+            leaderboardList[index] = ( (qry.username, ( p.score + leaderboardList[index][1] )))
+          except ValueError:
+            thing_index = -1
+            leaderboardList.append((qry.username, p.score))
+      leaderboardList = sorted(leaderboardList,key=itemgetter(1))
+      leaderboardList.reverse()
+      if email:
+        qry = accountModel.get_by_id(users.get_current_user().user_id())
+        if qry:
+          fname = qry.firstName
+          lname = qry.lastName
+          username = qry.username
+        page_params = {
+          'user_email': email,
+          'firstName': fname,
+          'lastName': lname,
+          'username': username,
+          'lobby': lobby,
+          'login_url': users.create_login_url(),
+          'logout_url': users.create_logout_url('/'),
+          'board': leaderboardList,
+          'rank': rank
+        }
+        render_template(self, 'leaderboard.html', page_params)
+      else:
+        self.redirect('/')
 ################## End Page Handlers ####################
 
 ################## url Mappings. ####################

@@ -29,6 +29,7 @@
   </div>
   <div class="contentbkg">
     <h2 align="center">All Lobbies:</h2>
+    {% if lobbynum2 > 0 %}
     <div class="table-responsive">
     <table class="challenge-table">
       <tr>
@@ -45,5 +46,9 @@
       {% endfor %}
     </table>
     </div>
+    {% else %}
+    <p class="chalquestion">There are no lobbies.<br>Go create one!</p>
+    <div class="text-center"><a class="btn btn-default" href="/createLobby">Create Lobby</a></div>
+    {% endif %}
   </div>
 {% endblock %}
