@@ -1,6 +1,5 @@
 from google.appengine.ext import ndb
 
-
 ################## NDB Models ####################
 # Account management table
 class accountModel(ndb.Model):
@@ -9,24 +8,20 @@ class accountModel(ndb.Model):
   username = ndb.StringProperty()
   score = ndb.IntegerProperty(default=0)
 
-
 # Lobby management table
 class lobbyModel(ndb.Model):
-  lobbyID = ndb.IntegerProperty()
   lobbyName = ndb.TextProperty()
-  publicBool = ndb.BooleanProperty()
-  ownerID = ndb.IntegerProperty()
+  ownerID = ndb.StringProperty()
 
 
 # Lobby Access table
 class lobbyAccessModel(ndb.Model):
-  lobbyID = ndb.IntegerProperty()
-  userID = ndb.IntegerProperty()
+  lobbyID = ndb.KeyProperty()
+  userID = ndb.StringProperty()
 
 
 # Challenge management table
 class challengeModel(ndb.Model):
-  challengeID = ndb.IntegerProperty()
   ownerID = ndb.StringProperty()
   question = ndb.TextProperty()
   answer = ndb.TextProperty()
@@ -37,8 +32,8 @@ class challengeModel(ndb.Model):
 
 # Challenge Access table
 class challengeAccessModel(ndb.Model):
-  challengeID = ndb.IntegerProperty()
-  lobbyID = ndb.IntegerProperty()
+  challengeID = ndb.KeyProperty()
+  lobbyID = ndb.KeyProperty()
 
 
 # progress tracking table

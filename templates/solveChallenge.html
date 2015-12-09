@@ -10,10 +10,11 @@
     <form align="center" onSubmit="return here()">
         <p class="chaltitle" align="center"><u>{{ chalObject.name }}</u></h2>
         <p class="chalquestion" align="center">{{ chalObject.question }}</p>
+        <!-- <a href="/SamsThing?challengeAttachment={{chalObject.key}}" class="chalquestion" align="center">Files for challenge.</a> -->
         <div id="answered">
             Answer:<br>
             <input type="text" name="answer" required="true"><br><br>
-            <input type="submit" value="Submit">
+            <input class="btn btn-default" type="submit" value="Submit">
         </div>
         <br><br><p class="chalanswer" align="center">Points for correct answer: {{ chalObject.score }}</p>
     </form>

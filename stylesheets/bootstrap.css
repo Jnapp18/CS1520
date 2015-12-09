@@ -22,6 +22,14 @@
   padding-bottom: 10px;
   background: rgba(240, 241, 238, 0.95);
 }
+.chalM
+{
+  font: 20px Roboto, Helvetica, sans-serif;
+  margin-right: 5%;
+  margin-left: 5%;
+  color: #333332;
+  text-align: left;
+}
 .chalquestion
 {
   font: 25px Roboto, Helvetica, sans-serif;

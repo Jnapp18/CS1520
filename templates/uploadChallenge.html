@@ -2,11 +2,11 @@
 {% block bodycontent %}
   <div class="contentbkg">
     <h2 align="center">Challenge Upload</h2>
-    <form align="center" method="post" enctype="multipart/form-data" action="{{ upload_url }}">
+    <form align="center" method="post" enctype="multipart/form-data">
       Name:<br>
       <input name="name" type="text" required="true"><br><br>
       Question:<br>
-      <input name="question" type="text" required="true"><br><br>
+      <textarea cols="40" rows="5" name="question" required></textarea><br><br>
       Answer:<br>
       <input name="answer" type="text" required="true"><br><br>
       Points:<br>
@@ -14,7 +14,7 @@
       Zip File:<br>
       <div align="center"><input name="file" type="file"></div>
       <br><br>
-      <input class="btn btn-default" value="     Go!      " type="submit">
+      <input class="btn btn-default" value="Upload Challenge" type="submit">
     </form>
   </div>
 {% endblock %}
