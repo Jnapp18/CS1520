@@ -9,14 +9,14 @@
         <th>Name</th>
         <th>Question</th>
         <th>Points</th>
-        <th>Completed</th>
+       <!--  <th>Completed</th> -->
       </tr>
       {% for chal in challenges %}
         <tr>
           <td><a href="/solveChallenge?lobbyID={{ lobbyID.urlsafe }}&amp;chal_id={{ chal.key.urlsafe }}">{{ chal.name }}</a></td>
           <td>{{ chal.question }}</td>
           <td>{{ chal.score }}</td>
-          <td id="completed{{forloop.counter}}"><span class="glyphicon glyphicon-remove"></span>"</td>
+          <!-- <td id="completed{{forloop.counter}}"><span class="glyphicon glyphicon-remove"></span></td>
           {% if prog == "none" %}
           <script>
             document.getElementById("completed{{forloop.counter}}").innerHTML = "<span class=\"glyphicon glyphicon-remove\"></span>";
@@ -33,7 +33,7 @@
                 </script>
               {% endif %}
             {% endfor %}
-          {% endif %}
+          {% endif %} -->
         </tr>
       {% endfor %}
     </table>

@@ -3,7 +3,7 @@
   <div class="contentbkg">
     <h2 align="center">Create Challenge</h2>
     <div class="text-center">
-    <form align="center" method="post" enctype="multipart/form-data">
+    <form align="center" action="{{ upload_url }}" method="post" enctype="multipart/form-data">
       Name:<br>
       <input name="name" type="text"  maxlength="30" required="true"><br><br>
       Question:<br>
@@ -12,6 +12,7 @@
       <input name="answer" type="text" required="true"><br><br>
       Points:<br>
       <input name="points" type="number" required="true"><br><br>
+      <input type="hidden" name="challengeId" value="{{challenge.key.urlsafe}}">
       Zip File:<br>
       <div align="center"><input name="file" type="file"></div>
       <br><br>
