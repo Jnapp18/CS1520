@@ -23,6 +23,7 @@ import logging
 import time
 from operator import itemgetter
 import re
+from google.appengine.api import memcache
 from google.appengine.api import users, mail
 from google.appengine.ext import blobstore
 from google.appengine.ext.webapp import blobstore_handlers
@@ -37,19 +38,12 @@ class MainHandler(webapp2.RequestHandler):
     fname = ""
     lname = ""
     username = ""
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
-      else:  # THIS IS WHERE I DID WORK. IF FIRST TIME USER, ADD THEM TO THE NDB, SEND THEM AN EMAIL -sk
-        lm = lobbyModel.query(lobbyModel.ownerID == "118168406204694893029 ").get()
-        if lm:
-          publob = lobbyAccessModel(lobbyID=lm.key, userID=users.get_current_user().user_id())
-          lobbyAccessModel.put(publob)
-        user = accountModel(id=users.get_current_user().user_id(), firstName=fname, lastName=lname, username=email.split("@", 1)[0])
-        accountModel.put(user)
+	
+    if memcache_usage():
+      fname = memcache.get("user_fname")
+      lname = memcache.get("user_lname")
+      username = memcache.get("user_username")
+
     page_params = {
       'user_email': email,
       'firstName': fname,
@@ -78,12 +72,10 @@ class accountManageDisplay(webapp2.RequestHandler):
     fname = ""
     lname = ""
     username = ""
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+    if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
     page_params = {
       'user_email': email,
       'firstName': fname,
@@ -101,13 +93,11 @@ class accountManagementHandler(webapp2.RequestHandler):
     fname = ""
     lname = ""
     username = ""
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
-      page_params = {
+    if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
+        page_params = {
         'user_email': email,
         'login_url': users.create_login_url(),
         'logout_url': users.create_logout_url('/'),
@@ -115,7 +105,7 @@ class accountManagementHandler(webapp2.RequestHandler):
         'lastName': lname,
         'username': username
       }
-      render_template(self, 'acctManage.html', page_params)
+        render_template(self, 'acctManage.html', page_params)
     else:
       self.redirect('/')
 
@@ -153,12 +143,10 @@ class LobbyHandler(webapp2.RequestHandler):
     lname = ""
     username = ""
     results = challengeModel.query()
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+    if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
     page_params = {
       'user_email': email,
       'firstName': fname,
@@ -181,12 +169,10 @@ class createLobbyHandler(webapp2.RequestHandler):
     resultSize = 0
     if(results.count()>0):
       resultSize = 1
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+    if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
     page_params = {
       'user_email': email,
       'firstName': fname,
@@ -204,11 +190,10 @@ class createLobbyHandler(webapp2.RequestHandler):
     lname = ""
     username = ""
     if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+      if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
       # updating the database with challenge information
       lModel = lobbyModel()
       lModel.ownerID = users.get_current_user().user_id()
@@ -253,11 +238,10 @@ class manageLobbyHandler(webapp2.RequestHandler):
     if(results2.count()>0):
       resultSize2 = 1
     if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+      if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
     page_params = {
       'user_email': email,
       'firstName': fname,
@@ -279,8 +263,11 @@ class enterLobbyHandler(webapp2.RequestHandler):
     fname = ""
     lname = ""
     username = ""
+    lobbyID = ""
+    lobbyName = ""
     resultSize = 0
     lobbyName = ""
+
     prog = ""
     lobbyID = ""
     results = ""
@@ -293,13 +280,13 @@ class enterLobbyHandler(webapp2.RequestHandler):
     if PittCTF == "PittCTF" or lobby.lobbyName == "PittCTF Public Lobby":
       if email:
         userQry = accountModel.get_by_id(users.get_current_user().user_id())
+        if memcache_usage():
+          fname = memcache.get("user_fname")
+          lname = memcache.get("user_lname")
+          username = memcache.get("user_username")
       else:
         self.redirect("/")
       pubLobQry = lobbyModel.query(lobbyModel.ownerID == "118168406204694893029").get()
-      if userQry:
-        fname = userQry.firstName
-        lname = userQry.lastName
-        username = userQry.username
       if pubLobQry:
         lobbyName = pubLobQry.lobbyName
         lobbyID = pubLobQry.key
@@ -327,10 +314,10 @@ class enterLobbyHandler(webapp2.RequestHandler):
         userQry = accountModel.get_by_id(users.get_current_user().user_id())
       else:
         self.redirect("/")
-      if userQry:
-        fname = userQry.firstName
-        lname = userQry.lastName
-        username = userQry.username
+      if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
       if lobbyID:
         lobby = ndb.Key(urlsafe=lobbyID).get()
         lobbyName = lobby.lobbyName
@@ -406,12 +393,10 @@ class manageChallengeHandler(webapp2.RequestHandler):
     if(results.count()>0):
       resultSize = 1
     publicResults = challengeModel.query()
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+    if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
     page_params = {
       'user_email': email,
       'firstName': fname,
@@ -442,11 +427,12 @@ class solveChallengeHandler(webapp2.RequestHandler):
     solved = 0 #not yet solved
     if email:
       qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+      if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
       chalObject = challengeModel.query(challengeModel.key == challenge.key).get()
+
       progTable = progressTable.query(progressTable.userID == user_id, progressTable.challengeID == challenge.key, progressTable.lobbyID == lobby.key).get()
       if progTable:
         #if query exists where userID and ChallengeID already exist, then we know they have solved this one
@@ -518,12 +504,10 @@ class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
     fname = ""
     lname = ""
     username = ""
-    if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+    if memcache_usage():
+      fname = memcache.get("user_fname")
+      lname = memcache.get("user_lname")
+      username = memcache.get("user_username")
       page_params = {
         'user_email': email,
         'firstName': fname,
@@ -550,17 +534,17 @@ class editChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
     challengePoints = 0
     challenge = ""
     challengeId = self.request.get("challengeId")
+
     logging.error(challengeId)
     logging.error(challengeId)
     logging.error(challengeId)
     logging.error(challengeId)
     logging.error(challengeId)
     if email:
-      userQry = accountModel.get_by_id(users.get_current_user().user_id())
-      if userQry:
-        fname = userQry.firstName
-        lname = userQry.lastName
-        username = userQry.username
+      if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
     
     if challengeId:
       challenge = ndb.Key(urlsafe=challengeId).get()
@@ -586,6 +570,7 @@ class editChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
     }
     render_template(self, 'editChallenge.html', page_params)
 
+
 # Leaderboard Handler
 class leaderboardHandler(webapp2.RequestHandler):
   def get(self):
@@ -593,6 +578,7 @@ class leaderboardHandler(webapp2.RequestHandler):
     fname = ""
     lname = ""
     username = ""
+    lobby = lobbyModel()
     rank = 0
     pubLobQry = lobbyModel.query(lobbyModel.ownerID == "118168406204694893029").get()
     lobbyID = self.request.get('lobbyID')
@@ -626,11 +612,10 @@ class leaderboardHandler(webapp2.RequestHandler):
       leaderboardList = sorted(leaderboardList,key=itemgetter(1))
       leaderboardList.reverse()
       if email:
-        qry = accountModel.get_by_id(users.get_current_user().user_id())
-        if qry:
-          fname = qry.firstName
-          lname = qry.lastName
-          username = qry.username
+        if memcache_usage():
+          fname = memcache.get("user_fname")
+          lname = memcache.get("user_lname")
+          username = memcache.get("user_username")
         page_params = {
           'user_email': email,
           'firstName': fname,
@@ -734,11 +719,10 @@ class uploadedHandler(webapp2.RequestHandler):
     lname = ""
     username = ""
     if email:
-      qry = accountModel.get_by_id(users.get_current_user().user_id())
-      if qry:
-        fname = qry.firstName
-        lname = qry.lastName
-        username = qry.username
+      if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
       page_params = {
         'user_email': email,
         'login_url': users.create_login_url(),
@@ -752,6 +736,35 @@ class uploadedHandler(webapp2.RequestHandler):
       self.redirect('/')
 
 
+def memcache_usage():
+	email = get_user_email()
+	fname = ''
+	lname = ''
+	username = ''
+	if email:
+		if memcache.get("user_"):
+			return True
+		else:
+			qry = accountModel.get_by_id(users.get_current_user().user_id())
+			if qry:
+				fname = qry.firstName
+				lname = qry.lastName
+				username = qry.username
+			else:  
+				lm = lobbyModel.query(lobbyModel.ownerID == "118168406204694893029 ").get()
+				if lm:
+					publob = lobbyAccessModel(lobbyID=lm.key, userID=users.get_current_user().user_id())
+					lobbyAccessModel.put(publob)
+				user = accountModel(id=users.get_current_user().user_id(), firstName=fname, lastName=lname, username=email.split("@", 1)[0])
+				accountModel.put(user)
+				
+			memcache.set_multi({"fname": fname,
+						"lname": lname,
+						"username": username},
+						key_prefix="user_", time=3600)
+			return True
+	return False
+	
 ################## url Mappings. ####################
 # When a URL is clicked, goes to the function to take care of the specific request.
 mappings = [
