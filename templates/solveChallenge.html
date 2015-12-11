@@ -1,6 +1,7 @@
 {% extends "_base.html" %}
 {% block bodycontent %}
 <div id="question" class="contentbkg">
+    <div class="text-center">
     {% if solved == 1 %}
     <p class="chaltitle" align="center"><u>{{ chalObject.name }}</u></h2>
     <p class="chalquestion" align="center">{{ chalObject.question }}</p>
@@ -10,15 +11,20 @@
     <form align="center" onSubmit="return here()">
         <p class="chaltitle" align="center"><u>{{ chalObject.name }}</u></h2>
         <p class="chalquestion" align="center">{{ chalObject.question }}</p>
-        <!-- <a href="/SamsThing?challengeAttachment={{chalObject.key}}" class="chalquestion" align="center">Files for challenge.</a> -->
+        <br>
+        {% if chalObject.blob_key %}
+        <a class="btn btn-default" href="/view_file/{{chalObject.blob_key}}" class="chalquestion" align="center">Files for challenge.</a>
+        {% endif %}
         <div id="answered">
             Answer:<br>
-            <input type="text" name="answer" required="true"><br><br>
+            <input type="text" name="answer" maxlength="300" required="true"><br><br>
             <input class="btn btn-default" type="submit" value="Submit">
         </div>
         <br><br><p class="chalanswer" align="center">Points for correct answer: {{ chalObject.score }}</p>
     </form>
     {% endif %}
+    </div>
+    <div class="text-center"><a class="btn btn-default" href="/enterLobby?lobbyID={{ lobbyID.urlsafe }}">Back to lobby</a></div><br>
 </div>
 <!-- MODALS -->
 <div id="correctModal" class="modal fade" role="dialog">

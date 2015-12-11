@@ -25,6 +25,7 @@ from operator import itemgetter
 import re
 from google.appengine.api import memcache
 from google.appengine.api import users, mail
+from google.appengine.ext import blobstore
 from google.appengine.ext.webapp import blobstore_handlers
 
 
@@ -205,8 +206,6 @@ class createLobbyHandler(webapp2.RequestHandler):
       for chals in lobbyChallengeList:
         chalAccModel = challengeAccessModel()
         chalList = re.findall(r"[^\\,\'\W)]+", chals)
-        logging.error(chalList[1])
-        logging.error(chalList[2])
         chalAccModel.challengeID = ndb.Key(chalList[1], long(chalList[2]))
         chalAccModel.lobbyID = lModel.key
         chalAccModel.put()
@@ -235,6 +234,9 @@ class manageLobbyHandler(webapp2.RequestHandler):
     resultSize = 0
     if(results.count()>0):
       resultSize = 1
+    resultSize2 = 0
+    if(results2.count()>0):
+      resultSize2 = 1
     if email:
       if memcache_usage():
         fname = memcache.get("user_fname")
@@ -245,6 +247,7 @@ class manageLobbyHandler(webapp2.RequestHandler):
       'firstName': fname,
       'lastName': lname,
       'lobbynum': resultSize,
+      'lobbynum2': resultSize2,
       'lobbies': results,
       'alllobbies': results2,
       'username': username,
@@ -264,7 +267,10 @@ class enterLobbyHandler(webapp2.RequestHandler):
     lobbyName = ""
     resultSize = 0
     lobbyName = ""
-    results = challengeModel.query(challengeModel.ownerID == "118168406204694893029")
+
+    prog = ""
+    lobbyID = ""
+    results = ""
     PittCTF = self.request.get("lobby")
     if PittCTF == "PittCTF":
       print 'do nothing'
@@ -274,24 +280,27 @@ class enterLobbyHandler(webapp2.RequestHandler):
     if PittCTF == "PittCTF" or lobby.lobbyName == "PittCTF Public Lobby":
       if email:
         userQry = accountModel.get_by_id(users.get_current_user().user_id())
+        if memcache_usage():
+          fname = memcache.get("user_fname")
+          lname = memcache.get("user_lname")
+          username = memcache.get("user_username")
       else:
         self.redirect("/")
       pubLobQry = lobbyModel.query(lobbyModel.ownerID == "118168406204694893029").get()
-      if userQry:
-        fname = userQry.firstName
-        lname = userQry.lastName
-        username = userQry.username
       if pubLobQry:
         lobbyName = pubLobQry.lobbyName
         lobbyID = pubLobQry.key
+        prog = progressTable.query(progressTable.lobbyID == lobbyID, progressTable.userID == users.get_current_user().user_id())
         results = challengeModel.query(challengeModel.ownerID == "118168406204694893029")
         if(results.count()>0):
           resultSize = 1
+
       page_params = {
       'user_email': email,
       'firstName': fname,
       'lastName': lname,
       'username': username,
+      'prog': prog,
       'lobbyName': lobbyName,
       'lobbyID': lobbyID,
       'challenges': results,
@@ -305,10 +314,10 @@ class enterLobbyHandler(webapp2.RequestHandler):
         userQry = accountModel.get_by_id(users.get_current_user().user_id())
       else:
         self.redirect("/")
-      if userQry:
-        fname = userQry.firstName
-        lname = userQry.lastName
-        username = userQry.username
+      if memcache_usage():
+        fname = memcache.get("user_fname")
+        lname = memcache.get("user_lname")
+        username = memcache.get("user_username")
       if lobbyID:
         lobby = ndb.Key(urlsafe=lobbyID).get()
         lobbyName = lobby.lobbyName
@@ -323,7 +332,9 @@ class enterLobbyHandler(webapp2.RequestHandler):
             chalList.insert(i,l.challengeID)
             i = i + 1
           results = challengeModel.query(challengeModel.key.IN(chalList))
-
+          prog = progressTable.query(progressTable.lobbyID == lobbyID, progressTable.userID == users.get_current_user().user_id())
+          if prog == None:
+            prog = "none"
           if(results.count()>0):
             resultSize = 1
           page_params = {
@@ -331,6 +342,7 @@ class enterLobbyHandler(webapp2.RequestHandler):
           'firstName': fname,
           'lastName': lname,
           'username': username,
+          'prog': prog,
           'lobbyName': lobbyName,
           'lobbyID': lobbyID,
           'challenges': results,
@@ -353,6 +365,7 @@ class enterLobbyHandler(webapp2.RequestHandler):
           }
           render_template(self, 'lobbySignIn.html', page_params)  
   def post(self):
+    logging.error("asdfsdfsadf")
     email = get_user_email()
     password = self.request.get('password')
     lobbyID = self.request.get('lobbyID')
@@ -363,7 +376,7 @@ class enterLobbyHandler(webapp2.RequestHandler):
         #do the lam stuff
         publob = lobbyAccessModel(lobbyID=lobby.key, userID=users.get_current_user().user_id())
         lobbyAccessModel.put(publob)
-        time.sleep(1)
+        time.sleep(0.5)
         self.response.out.write('Correct')
       else:
         self.response.out.write('Incorrect')
@@ -418,7 +431,8 @@ class solveChallengeHandler(webapp2.RequestHandler):
         fname = memcache.get("user_fname")
         lname = memcache.get("user_lname")
         username = memcache.get("user_username")
-      chalObject = challengeModel.query(challengeModel.name == challenge.name).get()
+      chalObject = challengeModel.query(challengeModel.key == challenge.key).get()
+
       progTable = progressTable.query(progressTable.userID == user_id, progressTable.challengeID == challenge.key, progressTable.lobbyID == lobby.key).get()
       if progTable:
         #if query exists where userID and ChallengeID already exist, then we know they have solved this one
@@ -471,7 +485,7 @@ class solveChallengeHandler(webapp2.RequestHandler):
           Challenge.ownerID = users.get_current_user().user_id()
           Challenge.question = challenge.question
           Challenge.answer = challenge.answer
-          Challenge.attachments = challenge.attachments
+          Challenge.blob_key = challenge.blob_key
           Challenge.score = challenge.score
           Challenge.name = challenge.name
           Challenge.put()
@@ -500,40 +514,10 @@ class uploadChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
         'lastName': lname,
         'username': username,
         'login_url': users.create_login_url(),
-        'logout_url': users.create_logout_url('/')
+        'logout_url': users.create_logout_url('/'),
+        'upload_url': blobstore.create_upload_url('/upload_file')
       }
       render_template(self, 'uploadChallenge.html', page_params)
-    else:
-      self.redirect('/')
-  def post(self):
-    email = get_user_email()
-    fname = ""
-    lname = ""
-    username = ""
-    if memcache_usage():
-      fname = memcache.get("user_fname")
-      lname = memcache.get("user_lname")
-      username = memcache.get("user_username")
-      # updating the database with challenge information
-      uploaded_file = self.get_uploads()
-      Challenge = challengeModel()
-      Challenge.ownerID = users.get_current_user().user_id()
-      Challenge.question = self.request.get('question')
-      Challenge.answer = self.request.get('answer')
-      Challenge.attachments = uploaded_file
-      Challenge.score = int(self.request.get('points'))
-      Challenge.name = self.request.get('name')
-      Challenge.put()
-      time.sleep(0.2)
-      page_params = {
-        'login_url': users.create_login_url(),
-        'logout_url': users.create_logout_url('/'),
-        'user_email': email,
-        'firstName': fname,
-        'lastName': lname,
-        'username': username
-      }
-      self.redirect('/manageChallenges')
     else:
       self.redirect('/')
 
@@ -548,8 +532,16 @@ class editChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
     challengeQuestion = ""
     challengeAnswer = ""
     challengePoints = 0
+    challenge = ""
     challengeId = self.request.get("challengeId")
-    if memcache_usage():
+
+    logging.error(challengeId)
+    logging.error(challengeId)
+    logging.error(challengeId)
+    logging.error(challengeId)
+    logging.error(challengeId)
+    if email:
+      if memcache_usage():
         fname = memcache.get("user_fname")
         lname = memcache.get("user_lname")
         username = memcache.get("user_username")
@@ -562,54 +554,22 @@ class editChallengeHandler(blobstore_handlers.BlobstoreUploadHandler):
       challengeQuestion = challenge.question
       challengeAnswer = challenge.answer
       challengePoints = challenge.score
-      
-    
     page_params = {
     'user_email': email,
     'firstName': fname,
     'lastName': lname,
     'username': username,
+    'challengeId': self.request.get('challengeId'),
     'challengeName': challengeName,
     'challengeQuestion': challengeQuestion,
     'challengeAnswer': challengeAnswer,
     'challengePoints': challengePoints,
     'login_url': users.create_login_url(),
+    'upload_url': blobstore.create_upload_url('/upload_fil'),
     'logout_url': users.create_logout_url('/')
     }
     render_template(self, 'editChallenge.html', page_params)
-    
-  def post(self):
-    email = get_user_email()
-    fname = ""
-    lname = ""
-    username = ""
-    challengeId = self.request.get("challengeId")
-    if memcache_usage():
-      fname = memcache.get("user_fname")
-      lname = memcache.get("user_lname")
-      username = memcache.get("user_username")
-        # updating the database with updated challenge information
-      uploaded_file = self.get_uploads()
-      if challengeId:
-        Challenge = ndb.Key(urlsafe=challengeId).get()
-        Challenge.question = self.request.get('question')
-        Challenge.answer = self.request.get('answer')
-        Challenge.attachments = uploaded_file
-        Challenge.score = int(self.request.get('points'))
-        Challenge.name = self.request.get('name')
-        Challenge.put()
-        page_params = {
-        'login_url': users.create_login_url(),
-        'logout_url': users.create_logout_url('/'),
-        'user_email': email,
-        'firstName': fname,
-        'lastName': lname,
-        'username': username
-        }
-        time.sleep(0.2)  #There is a sleep timer here because the change will not appear when you redirect to manageChallenges.html unless you wait for 0.2 milliseconds
-        self.redirect('/manageChallenges')
-    else:
-      self.redirect('/manageChallenges')
+
 
 # Leaderboard Handler
 class leaderboardHandler(webapp2.RequestHandler):
@@ -624,29 +584,140 @@ class leaderboardHandler(webapp2.RequestHandler):
     lobbyID = self.request.get('lobbyID')
 
     if lobbyID:
-      logging.error("hehehasjdflkjadf")
       lobby = ndb.Key(urlsafe=lobbyID).get()
-    elif pubLobQry:
-      logging.error(pubLobQry.key)
-      lobbyID = pubLobQry.key
-      lobby = pubLobQry
-    progTable = progressTable.query(progressTable.lobbyID == lobby.key)
-    # userID 
-    # score 
-    leaderboardList = []
-    for p in progTable:
-      qry = accountModel.get_by_id(p.userID)
-      if (len(leaderboardList) == 0):
-        leaderboardList.append((qry.username, p.score))
+    else:
+      if not pubLobQry:
+        pubLobQry = 'break'
       else:
-        try:
-          index = [x[0] for x in leaderboardList].index(qry.username)
-          leaderboardList[index] = ( (qry.username, ( p.score + leaderboardList[index][1] )))
-        except ValueError:
-          thing_index = -1
+        lobbyID = pubLobQry.key
+        lobby = pubLobQry
+    if pubLobQry == 'break':
+      self.redirect('/')
+    else:
+      progTable = progressTable.query(progressTable.lobbyID == lobby.key)
+      # userID 
+      # score 
+      leaderboardList = []
+      for p in progTable:
+        qry = accountModel.get_by_id(p.userID)
+        if (len(leaderboardList) == 0):
           leaderboardList.append((qry.username, p.score))
-    leaderboardList = sorted(leaderboardList,key=itemgetter(1))
-    leaderboardList.reverse()
+        else:
+          try:
+            index = [x[0] for x in leaderboardList].index(qry.username)
+            leaderboardList[index] = ( (qry.username, ( p.score + leaderboardList[index][1] )))
+          except ValueError:
+            thing_index = -1
+            leaderboardList.append((qry.username, p.score))
+      leaderboardList = sorted(leaderboardList,key=itemgetter(1))
+      leaderboardList.reverse()
+      if email:
+        if memcache_usage():
+          fname = memcache.get("user_fname")
+          lname = memcache.get("user_lname")
+          username = memcache.get("user_username")
+        page_params = {
+          'user_email': email,
+          'firstName': fname,
+          'lastName': lname,
+          'username': username,
+          'lobby': lobby,
+          'login_url': users.create_login_url(),
+          'logout_url': users.create_logout_url('/'),
+          'board': leaderboardList,
+          'rank': rank
+        }
+        render_template(self, 'leaderboard.html', page_params)
+      else:
+        self.redirect('/')
+################## End Page Handlers ####################
+########################################################################################################################
+#############################################START SAM TESTING##########################################################
+########################################################################################################################
+
+class FileUploadHandler(blobstore_handlers.BlobstoreUploadHandler):
+  def post(self):
+    email = get_user_email()
+    if email:
+      try:
+        if len(self.get_uploads()) == 1:
+          upload = self.get_uploads()[0]
+          file_upload = challengeModel(
+            ownerID=users.get_current_user().user_id(),
+            blob_key=upload.key(),
+            name=self.request.get('name'),
+            question=self.request.get('question'),
+            answer=self.request.get('answer'),
+            score=int(self.request.get('points'))
+          )
+        else:
+          file_upload = challengeModel(
+            ownerID=users.get_current_user().user_id(),
+            name=self.request.get('name'),
+            question=self.request.get('question'),
+            answer=self.request.get('answer'),
+            score=int(self.request.get('points'))
+          )
+        file_upload.put()
+        self.redirect('/uploaded/')
+        time.sleep(0.3)
+        # self.redirect('/view_photo/%s' % upload.key())
+      except:
+        self.error(500)
+    else:
+      self.redirect('/')
+
+class FileUploadHandler2(blobstore_handlers.BlobstoreUploadHandler):
+  def post(self):
+    email = get_user_email()
+    if email:
+      try:
+        challengeId = self.request.get("challengeId")
+        if len(self.get_uploads()) == 1:
+          upload = self.get_uploads()[0]
+          challenge = ndb.Key(urlsafe=challengeId).get()
+          challenge.ownerID = users.get_current_user().user_id()
+          challenge.blob_key = upload.key()
+          challenge.name = self.request.get('name')
+          challenge.question = self.request.get('question')
+          challenge.answer = self.request.get('answer')
+          challenge.score = int(self.request.get('points'))
+          challenge.put()
+        else:
+          challenge = ndb.Key(urlsafe=challengeId).get()
+          challenge.ownerID = users.get_current_user().user_id()
+          challenge.blob_key = challenge.blob_key
+          challenge.name = self.request.get('name')
+          challenge.question = self.request.get('question')
+          challenge.answer = self.request.get('answer')
+          challenge.score = int(self.request.get('points'))
+          challenge.put()
+        self.redirect('/uploaded/')
+        time.sleep(0.3)
+        # self.redirect('/view_photo/%s' % upload.key())
+      except:
+        self.error(500)
+    else:
+      self.redirect('/')
+
+class ViewFileHandler(blobstore_handlers.BlobstoreDownloadHandler):
+  def get(self, file_key):
+    email = get_user_email()
+    if email:
+      if not blobstore.get(file_key):
+        self.error(404)
+      else:
+        self.send_blob(blobstore.BlobInfo.get(file_key), save_as=True)
+    else:
+      self.redirect('/')
+
+
+class uploadedHandler(webapp2.RequestHandler):
+  def get(self):
+    email = get_user_email()
+    fname = ""
+    lname = ""
+    username = ""
     if email:
       if memcache_usage():
         fname = memcache.get("user_fname")
@@ -654,19 +725,16 @@ class leaderboardHandler(webapp2.RequestHandler):
         username = memcache.get("user_username")
       page_params = {
         'user_email': email,
+        'login_url': users.create_login_url(),
+        'logout_url': users.create_logout_url('/'),
         'firstName': fname,
         'lastName': lname,
         'username': username,
-        'lobby': lobby,
-        'login_url': users.create_login_url(),
-        'logout_url': users.create_logout_url('/'),
-        'board': leaderboardList,
-        'rank': rank
       }
-      render_template(self, 'leaderboard.html', page_params)
+      self.redirect('/manageChallenges')
     else:
       self.redirect('/')
-################## End Page Handlers ####################
+
 
 def memcache_usage():
 	email = get_user_email()
@@ -682,7 +750,7 @@ def memcache_usage():
 				fname = qry.firstName
 				lname = qry.lastName
 				username = qry.username
-			else:  # THIS IS WHERE I DID WORK. IF FIRST TIME USER, ADD THEM TO THE NDB, SEND THEM AN EMAIL -sk
+			else:  
 				lm = lobbyModel.query(lobbyModel.ownerID == "118168406204694893029 ").get()
 				if lm:
 					publob = lobbyAccessModel(lobbyID=lm.key, userID=users.get_current_user().user_id())
@@ -713,6 +781,10 @@ mappings = [
   ('/acctManage', accountManagementHandler),
   ('/acctManageInfo', accountManageDisplay),
   ('/leaderboard', leaderboardHandler),
-  ('/editChallenge', editChallengeHandler)
+  ('/upload_file', FileUploadHandler),
+  ('/upload_fil', FileUploadHandler2),
+  ('/view_file/([^/]+)?', ViewFileHandler),
+  ('/uploaded*', uploadedHandler),
+  ('/uploaded/*', uploadedHandler)
 ]
 app = webapp2.WSGIApplication(mappings, debug=True)

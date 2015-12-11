@@ -2,19 +2,22 @@
 {% block bodycontent %}
   <div class="contentbkg">
     <h2 align="center">Edit Challenge</h2>
-    <form align="center" method="post" enctype="multipart/form-data">
+    <div class="text-center">
+    <form method="post"  action="{{ upload_url }}" enctype="multipart/form-data">
       Name:<br>
-      <input name="name" type="text"  maxlength="30" required="true"><br><br>
+      <input name="name" type="text" value="{{challengeName}}"  maxlength="30" required="true"><br><br>
       Question:<br>
-      <textarea cols="40" rows="5" name="question" required></textarea><br><br>
+      <textarea cols="40" rows="5" name="question" required>{{challengeQuestion}}</textarea><br><br>
       Answer:<br>
-      <input name="answer" type="text" required="true"><br><br>
+      <input name="answer" type="text" value="{{challengeAnswer}}" required="true"><br><br>
       Points:<br>
-      <input name="points" type="number" required="true"><br><br>
+      <input name="points" type="number" value="{{challengePoints}}" required="true"><br><br>
       Zip File:<br>
       <div align="center"><input name="file" type="file"></div>
       <br><br>
+      <input type="hidden" name="challengeId" value="{{ challengeId }}">
       <input class="btn btn-default" value="Save Changes" type="submit">
     </form>
+    </div>
   </div>
 {% endblock %}

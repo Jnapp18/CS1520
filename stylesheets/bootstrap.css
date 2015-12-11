@@ -144,22 +144,29 @@ a {
   color: #ffd464;
 }
 
-/* line 62, style.sass */
 .challenge-table {
-  text-align: center;
-  margin: 1em 0;
-  display: block;
-  max-width: 300px;
-  border-collapse: collapse;
-  table-layout:fixed;
+  border-top-left-radius: 0.6em;
+  border-top-right-radius: 0.6em;
+  border-bottom-left-radius: 0.6em;
+  border-bottom-right-radius: 0.6em;
+  margin: auto; 
+  max-width: 80%;
+  background: #333332;
+  color: #f0f1ee;
 }
 .challenge-table td {
   white-space: nowrap;
   overflow: hidden;
   max-width: 300px;
-  min-width: 150px;
+  min-width: 70px;
   text-overflow: ellipsis;
-
+}
+.challenge-table th {
+  white-space: nowrap;
+  max-width: 300px;
+  overflow: hidden;
+  min-width: 70px;
+  text-overflow: ellipsis;
 }
 .challenge-table a, .challenge-table a:hover, .challenge-table a:visited, a:active {
     color: #ffd464;   
@@ -175,12 +182,13 @@ tr {
   border-bottom: 1px solid #f0f1ee;
 }
 
-/* line 73, style.sass */
-th {
-  display: none;
+tr:first-child {
+  border-top: 0px solid #f0f1ee;
 }
-
-/* line 76, style.sass */
+/* line 80, style.sass */
+tr:last-child {
+  border-bottom: 0px solid #f0f1ee;
+}
 td {
   display: block;
 }
@@ -211,15 +219,7 @@ th:first-child, td:first-child {
 /* line 98, style.sass */
 th:last-child, td:last-child {
   padding-right: 0;
-}
-
-/* line 100, style.sass */
-.challenge-table {
-  background: #333332;
-  color: #f0f1ee;
-  border-radius: 0.4em;
-  overflow: hidden;
-}
+}/* line 100, style.sass */
 
 /* line 105, style.sass */
 tr {
@@ -542,8 +542,12 @@ th {
 @font-face {
   font-family: 'Glyphicons Halflings';
 
-  src: url('../fonts/glyphicons-halflings-regular.eot');
-  src: url('../fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../fonts/glyphicons-halflings-regular.woff2') format('woff2'), url('../fonts/glyphicons-halflings-regular.woff') format('woff'), url('../fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+  src: url('glyphicons-halflings-regular.eot');
+  src: url('glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), 
+  url('glyphicons-halflings-regular.woff2') format('woff2'), 
+  url('glyphicons-halflings-regular.woff') format('woff'), 
+  url('glyphicons-halflings-regular.ttf') format('truetype'), 
+  url('glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
 }
 .glyphicon {
   position: relative;
@@ -2710,7 +2714,6 @@ table th[class*="col-"] {
 .table > thead > tr.danger > th,
 .table > tbody > tr.danger > th,
 .table > tfoot > tr.danger > th {
-  background-color: #f2dede;
 }
 .table-hover > tbody > tr > td.danger:hover,
 .table-hover > tbody > tr > th.danger:hover,
@@ -2729,7 +2732,6 @@ table th[class*="col-"] {
     margin-bottom: 15px;
     overflow-y: hidden;
     -ms-overflow-style: -ms-autohiding-scrollbar;
-    border: 1px solid #ddd;
   }
   .table-responsive > .table {
     margin-bottom: 0;
@@ -2751,7 +2753,6 @@ table th[class*="col-"] {
   .table-responsive > .table-bordered > thead > tr > td:first-child,
   .table-responsive > .table-bordered > tbody > tr > td:first-child,
   .table-responsive > .table-bordered > tfoot > tr > td:first-child {
-    border-left: 0;
   }
   .table-responsive > .table-bordered > thead > tr > th:last-child,
   .table-responsive > .table-bordered > tbody > tr > th:last-child,
@@ -2759,13 +2760,11 @@ table th[class*="col-"] {
   .table-responsive > .table-bordered > thead > tr > td:last-child,
   .table-responsive > .table-bordered > tbody > tr > td:last-child,
   .table-responsive > .table-bordered > tfoot > tr > td:last-child {
-    border-right: 0;
   }
   .table-responsive > .table-bordered > tbody > tr:last-child > th,
   .table-responsive > .table-bordered > tfoot > tr:last-child > th,
   .table-responsive > .table-bordered > tbody > tr:last-child > td,
   .table-responsive > .table-bordered > tfoot > tr:last-child > td {
-    border-bottom: 0;
   }
 }
 fieldset {

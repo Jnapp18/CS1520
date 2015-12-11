@@ -1,6 +1,7 @@
 {% extends "_base.html" %}
 {% block bodycontent %}
 <div class="contentbkg">
+    <div class="text-center">
 	<h2 align="center">Manage Account</h2>
 	<form align="center" method="post" enctype="multipart/form-data">
 	<p class="actm">First Name</p>
@@ -9,7 +10,8 @@
 	<input name="lname" type="text" value="{{lastName}}" maxlength="50" required><br><br><br>
 	<p class="actm">Username:</p>
 	<input name="username" type="text" value="{{username}}" maxlength="20" required><br><br><br>
-	<input class="btn btn-default" type="submit">
+	<input class="btn btn-default" value="Submit" type="submit">
 	</form>
+	</div>
 </div>
 {% endblock %}

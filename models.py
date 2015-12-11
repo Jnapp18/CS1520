@@ -25,10 +25,9 @@ class challengeModel(ndb.Model):
   ownerID = ndb.StringProperty()
   question = ndb.TextProperty()
   answer = ndb.TextProperty()
-  attachments = ndb.BlobProperty
   score = ndb.IntegerProperty()
   name = ndb.StringProperty()
-
+  blob_key = ndb.BlobKeyProperty()
 
 # Challenge Access table
 class challengeAccessModel(ndb.Model):

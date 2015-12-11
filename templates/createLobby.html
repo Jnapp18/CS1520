@@ -3,12 +3,14 @@
   <div class="contentbkg">
     {% if numchallenges > 0 %}
     <h2 align="center">Create New Lobby</h2>
+    <div class="text-center">
     <form align="center" method="post" enctype="multipart/form-data">
       Lobby Name:<br>
-      <input name="lobbyname" type="text" required="true"><br><br>
+      <input name="lobbyname" type="text" maxlength="50" required="true"><br><br>
       Lobby Password:<br>
-      <input name="lobbypass" type="password"><br><br>
-      <table class="challenge-table" align="center" style="margin: 0px auto;">
+      <input name="lobbypass" maxlength="20" type="password"><br><br>
+      <div class="table-responsive">
+      <table class="challenge-table">
         <tr>
           <th>Name</th>
           <th>Question</th>
@@ -23,9 +25,12 @@
             <td><input type="checkbox" name="selectedQuestions" value="{{ chal.key }}"></td>
           </tr>
         {% endfor %}
-      </table><br>
+      </table>
+      <div class="table-responsive">
+      <br>
       <input class="btn btn-default" value="Create Lobby" type="submit">
     </form>
+    </div>
     {% else %}
     <p class="chalquestion">You haven't created any challenges yet!<br>You need to create challenges to create a lobby!<br>Go create some!</p>
     <div class="text-center"><a class="btn btn-default" href="/uploadChallenge">Create Challenge</a></div>
